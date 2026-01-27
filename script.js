@@ -95,3 +95,26 @@ function closeAdmin() {
 function wipeData() {
     if(confirm("سيتم مسح كل الحسابات نهائياً.. متأكد؟")) { localStorage.clear(); location.reload(); }
 }
+const cacheName = 'mosad-v1';
+const assets = ['/', '/index.html', '/style.css', '/script.js'];
+
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(cacheName).then(cache => {
+      cache.addAll(assets);
+    })
+  );
+});
+
+self.addEventListener('fetch', e => {
+  e.respondWith(
+    fetch(e.request).catch(() => caches.match(e.request))
+  );
+});
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('App Ready!'))
+      .catch(err => console.log('App Failed', err));
+  });
+}
