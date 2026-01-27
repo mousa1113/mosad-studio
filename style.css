@@ -1,0 +1,158 @@
+/* --- كود موقعك الأصلي (لا يمكن حذفه) --- */
+:root {
+    --bg-color: #0d0d0d; 
+    --bg-pattern: url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+    --card: #1a1a1a; 
+    --text: #ffffff; 
+    --gold: #d4af37; 
+    --grad: linear-gradient(135deg, #d4af37 0%, #f1c40f 100%);
+}
+
+.mode-checkbox:checked ~ .main-wrapper {
+    --bg-color: #f4f4f4; 
+    --bg-pattern: url('https://www.transparenttextures.com/patterns/pinstriped-suit.png');
+    --card: #ffffff; 
+    --text: #1a1a1a; 
+    --gold: #8b6e3f;
+}
+
+* { margin:0; padding:0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
+body { background-color: var(--bg-color); transition: 0.5s; overflow-x: hidden; }
+
+.main-wrapper { background-image: var(--bg-pattern); min-height: 100vh; color: var(--text); position: relative; }
+
+header { 
+    padding: 10px 5%; 
+    position: fixed; 
+    width: 100%; 
+    top: 0; 
+    z-index: 1000; 
+    backdrop-filter: blur(10px); 
+    background: rgba(0,0,0,0.6); 
+    border-bottom: 1px solid rgba(212,175,55,0.1); 
+}
+
+.navbar { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: auto; }
+.logo { font-size: 24px; font-weight: 900; color: var(--gold); }
+.header-actions { display: flex; align-items: center; gap: 15px; }
+
+.btn-book { 
+    background: var(--grad); 
+    color: #000 !important; 
+    padding: 8px 15px; 
+    border-radius: 50px; 
+    text-decoration: none; 
+    font-weight: bold; 
+    font-size: 13px; 
+    white-space: nowrap;
+}
+
+.hero { 
+    height: 100vh; 
+    display: flex; 
+    align-items: center; 
+    justify-content: center; 
+    text-align: center; 
+    background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                url('https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&w=1350&q=80') center/cover no-repeat;
+}
+
+.hero-content h1 { font-size: clamp(2rem, 8vw, 4rem); font-weight: 900; line-height: 1.2; margin-bottom: 20px; }
+.hero-content h1 span { color: var(--gold); }
+
+.main-btn, .sec-btn { 
+    padding: 15px 35px; border-radius: 50px; text-decoration: none; font-weight: 900; display: inline-block; margin: 10px; font-size: 16px; 
+}
+.main-btn { background: var(--grad); color: #000 !important; }
+.sec-btn { border: 2px solid #fff; color: #fff !important; }
+
+section { padding: 80px 5%; }
+.section-title { font-size: 2.2rem; text-align: center; margin-bottom: 40px; color: var(--gold); font-weight: 900; }
+
+.services-grid, .barbers-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; max-width: 1200px; margin: auto; }
+.inner, .barber-card { background: var(--card); padding: 30px; border-radius: 20px; border: 1px solid rgba(212,175,55,0.1); text-align: center; }
+
+.img-frame { width: 100%; height: 380px; border-radius: 15px; overflow: hidden; margin-bottom: 15px; border: 1px solid var(--gold); }
+.img-frame img { width: 100%; height: 100%; object-fit: cover; }
+
+.booking-card { max-width: 650px; margin: auto; background: var(--card); border-radius: 25px; padding: 30px; border: 1px solid var(--gold); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+.form-row input { background: rgba(128,128,128,0.1); border: 1px solid rgba(128,128,128,0.2); padding: 12px; border-radius: 10px; color: var(--text); width: 100%; }
+
+.options-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.opt { padding: 8px 15px; border: 1px solid rgba(128,128,128,0.3); border-radius: 50px; cursor: pointer; font-size: 13px; color: var(--text); }
+.opt.selected { background: var(--grad); color: #000 !important; font-weight: bold; }
+
+.slots-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(75px, 1fr)); gap: 8px; }
+.slot { padding: 10px; background: rgba(128,128,128,0.1); border-radius: 8px; text-align: center; cursor: pointer; font-size: 12px; }
+.slot.active { border: 2px solid var(--gold); color: var(--gold); }
+.slot.booked { opacity: 0.2; cursor: not-allowed; text-decoration: line-through; }
+
+.btn-confirm { width: 100%; padding: 18px; background: var(--grad); border: none; border-radius: 12px; font-weight: 900; font-size: 1.1rem; cursor: pointer; color: #000; margin-top: 20px; }
+
+.floating-wa { position: fixed; bottom: 25px; right: 25px; background: #25d366; width: 60px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 30px; z-index: 2000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); text-decoration: none; }
+
+/* --- [كود الإدارة الجديد - ضيفه هنا] --- */
+.btn-staff-trigger { 
+    background: transparent; 
+    border: 1px solid var(--gold); 
+    color: var(--gold); 
+    padding: 5px 12px; 
+    border-radius: 20px; 
+    font-weight: bold; 
+    cursor: pointer; 
+    margin-right: 10px; 
+    font-size: 12px;
+}
+
+.staff-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+    background: rgba(0,0,0,0.95); z-index: 9999; 
+    display: none; justify-content: center; padding-top: 50px; 
+    overflow-y: auto;
+}
+
+.staff-content { width: 90%; max-width: 400px; text-align: center; color: white; }
+
+.staff-header { 
+    display: flex; justify-content: space-between; align-items: center; 
+    border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px; 
+}
+
+.close-x { background: #ff4757; border: none; color: white; padding: 5px 15px; border-radius: 5px; cursor: pointer; }
+
+.staff-btns button { 
+    width: 100%; padding: 15px; margin: 5px 0; background: #1a1a1a; 
+    color: white; border: 1px solid #333; border-radius: 10px; font-weight: bold; 
+}
+
+.gold-btn { border-color: var(--gold) !important; color: var(--gold) !important; }
+
+.staff-form input { 
+    width: 100%; padding: 15px; margin: 10px 0; background: #000; 
+    border: 1px solid #333; border-radius: 10px; color: white; text-align: center; 
+}
+
+.save-btn { 
+    width: 100%; padding: 15px; background: var(--grad); border: none; 
+    border-radius: 10px; font-weight: bold; color: black; margin-top: 10px; 
+}
+
+.admin-glow-btn { 
+    width: 100%; padding: 15px; background: transparent; color: var(--gold); 
+    border: 2px dashed var(--gold); border-radius: 10px; margin-bottom: 15px; 
+}
+
+.total-card { background: var(--grad); color: black; padding: 20px; border-radius: 15px; margin: 15px 0; }
+
+.table-wrapper { background: #111; border-radius: 10px; padding: 10px; max-height: 250px; overflow-y: auto; }
+
+table { width: 100%; border-collapse: collapse; font-size: 12px; }
+th, td { padding: 10px; border-bottom: 1px solid #222; text-align: center; }
+
+@media (max-width: 480px) {
+    .logo { font-size: 18px; }
+    .hero-content h1 { font-size: 1.8rem; }
+    .main-btn, .sec-btn { width: 90%; }
+    .form-row { grid-template-columns: 1fr; }
+}

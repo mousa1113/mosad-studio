@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mosad Hairdresser | ملوك الشياكة</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <input type="checkbox" id="dark-mode-toggle" class="mode-checkbox">
+    <div class="main-wrapper">
+        
+        <header>
+            <nav class="navbar">
+                <div class="logo">Mosad <span>Studio</span></div>
+                <div class="header-actions">
+                    <button class="btn-staff-trigger" onclick="openStaffApp()">👤 دخول الموظفين</button>
+                    
+                    <label for="dark-mode-toggle" class="mode-label">
+                        <span class="moon">🌙</span><span class="sun">☀️</span>
+                    </label>
+                    <a href="#booking" class="btn-book">احجز ميكانك</a>
+                </div>
+            </nav>
+        </header>
+
+        <section id="home" class="hero">
+            <div class="hero-content">
+                <span class="top-tag">نورنا يا برنس في عالم التميز</span>
+                 <h1>مش مجرد حلاقة..</h1>
+                <p>إحنا بنرسم الضحكة على وشك بالشياكة اللي تستاهلها.</p>
+                <div class="hero-btns">
+                    <a href="#booking" class="main-btn">أنجز واحجز ميعادك</a>
+                    <a href="#services" class="sec-btn">شوف بنعمل إيه</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="services">
+            <h2 class="section-title">بنعمل إيه عشانك؟</h2>
+            <div class="services-grid">
+                <div class="service-box"><div class="inner"><span class="num">01</span><h3>حلاقة شعر</h3><p>قصات على وضعك، وتدريج بالمسطرة والقلم.</p></div></div>
+                <div class="service-box"><div class="inner"><span class="num">02</span><h3>حلاقه دقن</h3><p>تحديد ذقن يخلي شكلك برنس.</p></div></div>
+                <div class="service-box"><div class="inner"><span class="num">03</span><h3>تنظيف البشرة</h3><p>جلسة تنظيف عشان وشك ينور ويرجع فريش.</p></div></div>
+            </div>
+        </section>
+
+        <section id="barbers">
+            <h2 class="section-title">إيديهم تتلف في حرير</h2>
+            <div class="barbers-container">
+                <div class="barber-card">
+                    <div class="img-frame"><img src="mosad.jpg" alt="مسعد"></div>
+                    <div class="info"><h3>كابتن مسعد</h3><span>المدير العام</span></div>
+                </div>
+                <div class="barber-card">
+                    <div class="img-frame"><img src="mohamed.jpg" alt="محمد"></div>
+                    <div class="info"><h3>محمد</h3><span>الفنان </span></div>
+                </div>
+                <div class="barber-card">
+                    <div class="img-frame"><img src="mahmoud.jpg" alt="محمود"></div>
+                    <div class="info"><h3>محمود</h3><span>معلم </span></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="booking">
+            <div class="booking-card">
+                <div class="booking-header">
+                    <h2>اظبط مواعيدك</h2>
+                    <p>اختار خدمتك والحلاق اللي يريحك وسيب الباقي علينا.</p>
+                </div>
+                <form id="bookingForm">
+                    <div class="form-row">
+                        <input type="text" id="custName" placeholder="اسمك إيه يا برنس؟" required>
+                        <input type="tel" id="custPhone" placeholder="رقم موبايلك" required>
+                    </div>
+                    <div class="step">
+                        <label>ناوي تعمل إيه النهاردة؟</label>
+                        <div class="options-grid">
+                            <div class="opt selected" onclick="updateOpt('pack', 'قص شعر', this)">شعر</div>
+                            <div class="opt" onclick="updateOpt('pack', 'حلاقة ذقن', this)">ذقن</div>
+                            <div class="opt" onclick="updateOpt('pack', 'بشرة', this)">بشرة</div>
+                            <div class="opt" onclick="updateOpt('pack', 'باقه كامله', this)">باقه كامله</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <label>عايز تقعد تحت إيد مين؟</label>
+                        <div class="options-grid">
+                            <div class="opt selected" onclick="updateOpt('barber', 'مسعد', this)">مسعد</div>
+                            <div class="opt" onclick="updateOpt('barber', 'محمد', this)">محمد</div>
+                            <div class="opt" onclick="updateOpt('barber', 'محمود', this)">محمود</div>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <label>اختار اليوم والساعة</label>
+                        <div id="daysGrid" class="options-grid scroll"></div>
+                        <div id="slotsGrid" class="slots-grid"></div>
+                    </div>
+                    <input type="hidden" id="packVal" value="قص شعر"><input type="hidden" id="barberVal" value="مسعد">
+                    <input type="hidden" id="dayVal"><input type="hidden" id="timeVal">
+                    <button type="button" class="btn-confirm" onclick="sendBooking()">أكد الحجز وكلمني واتساب ✅</button>
+                </form>
+            </div>
+        </section>
+
+        <div id="staff-layer" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); z-index:9999; overflow-y:auto; padding:20px; color:white; font-family:'Cairo', sans-serif;">
+            <div style="max-width:400px; margin:auto; text-align:center;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #333; padding-bottom:10px;">
+                    <h2 style="color:#d4af37;">خزنة الصالون 💈</h2>
+                    <button onclick="closeStaffApp()" style="background:#ff4757; border:none; color:white; padding:5px 15px; border-radius:5px; cursor:pointer;">إغلاق</button>
+                </div>
+                
+                <div id="app-login">
+                    <p>سجل دخول يا بطل:</p>
+                    <button onclick="appLogin('محمد')" style="width:100%; padding:15px; margin:5px 0; background:#1a1a1a; color:white; border:1px solid #333; border-radius:10px;">👤 محمد</button>
+                    <button onclick="appLogin('محمود')" style="width:100%; padding:15px; margin:5px 0; background:#1a1a1a; color:white; border:1px solid #333; border-radius:10px;">👤 محمود</button>
+                    <button onclick="appLogin('مسعد')" style="width:100%; padding:15px; margin:5px 0; background:#1a1a1a; color:#d4af37; border:1px solid #d4af37; border-radius:10px;">👑 كابتن مسعد</button>
+                </div>
+
+                <div id="app-work" style="display:none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                        <button onclick="backToLogin()" style="background:#333; border:none; color:white; padding:5px 10px; border-radius:5px;">🔙 رجوع</button>
+                        <h3 id="welcome-msg"></h3>
+                    </div>
+                    <button id="admin-btn" onclick="openAdmin()" style="display:none; width:100%; padding:15px; background:none; border:2px dashed #d4af37; color:#d4af37; border-radius:10px; margin-bottom:15px;">📊 كشف حساب الخزنة</button>
+                    <input type="text" id="w-cust" placeholder="اسم الزبون" style="width:100%; padding:15px; margin:5px 0; background:#000; border:1px solid #333; border-radius:10px; color:white; text-align:center;">
+                    <input type="number" id="w-amt" placeholder="المبلغ" style="width:100%; padding:15px; margin:5px 0; background:#000; border:1px solid #333; border-radius:10px; color:white; text-align:center;">
+                    <button onclick="saveMoney()" style="width:100%; padding:15px; background:linear-gradient(135deg, #d4af37 0%, #f1c40f 100%); border:none; border-radius:10px; font-weight:bold; color:black; margin-top:10px;">حفظ العملية ✅</button>
+                    <div style="margin-top:20px; font-size:1.2rem;">عملت كام انهارده؟ : <span id="u-total" style="color:#2ecc71;">0</span> ج.م</div>
+                </div>
+
+                <div id="app-admin" style="display:none;">
+                    <button onclick="backToWork()" style="background:#333; border:none; color:white; padding:5px 10px; border-radius:5px; float:right;">🔙 رجوع</button>
+                    <h3 style="color:#d4af37;">حساب المحل بالكامل</h3>
+                    <div style="background:linear-gradient(135deg, #d4af37 0%, #f1c40f 100%); color:black; padding:20px; border-radius:15px; margin:15px 0;">
+                        <p>إجمالي الفلوس</p>
+                        <h2 id="total-money">0</h2>
+                    </div>
+                    <div style="background:#111; border-radius:10px; padding:10px; max-height:250px; overflow-y:auto;">
+                        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+                            <thead><tr><th>الحلاق</th><th>المبلغ</th><th>الوقت</th></tr></thead>
+                            <tbody id="admin-log"></tbody>
+                        </table>
+                    </div>
+                    <button onclick="clearAllData()" style="width:100%; padding:10px; background:#444; color:white; border:none; border-radius:10px; margin-top:15px;">🧹 تصفير اليومية</button>
+                </div>
+            </div>
+        </div>
+
+        <a href="https://wa.me/201027842141" class="floating-wa" target="_blank">📲</a>
+        <footer><p>Mosad Hairdresser Studio &copy; 2026</p></footer>
+    </div>
+
+    <script>
+        // --- أكواد الموقع الأصلي (حفظاً على الحجز والصور) ---
+        function generateDays() {
+            const container = document.getElementById('daysGrid');
+            if(!container) return;
+            container.innerHTML = "";
+            const now = new Date();
+            for (let i = 0; i < 5; i++) {
+                const date = new Date(now);
+                date.setDate(now.getDate() + i);
+                const dKey = date.toISOString().split('T')[0];
+                const dName = date.toLocaleDateString('ar-EG', { weekday: 'short', day: 'numeric' });
+                const div = document.createElement('div');
+                div.className = 'opt day-opt';
+                div.innerText = dName;
+                div.onclick = () => {
+                    document.querySelectorAll('.day-opt').forEach(d => d.classList.remove('selected'));
+                    div.classList.add('selected');
+                    document.getElementById('dayVal').value = dKey;
+                    loadSlots();
+                };
+                container.appendChild(div);
+                if(i===0) div.click();
+            }
+        }
+        function updateOpt(type, val, el) {
+            el.parentElement.querySelectorAll('.opt').forEach(o => o.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById(type + 'Val').value = val;
+            if(type === 'barber') loadSlots();
+        }
+        function loadSlots() {
+            const container = document.getElementById('slotsGrid');
+            const date = document.getElementById('dayVal').value;
+            const barber = document.getElementById('barberVal').value;
+            if(!container) return;
+            container.innerHTML = "";
+            let storageKey = `res_${date}_${barber}`;
+            let booked = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            for (let h = 10; h < 23; h++) {
+                let timeStr = `${h > 12 ? h-12 : h}${h >= 12 ? 'م':'ص'}`;
+                const isBooked = booked.includes(timeStr);
+                const slot = document.createElement('div');
+                slot.className = `slot ${isBooked ? 'booked' : ''}`;
+                slot.innerText = isBooked ? "محجوز" : timeStr;
+                if(!isBooked) slot.onclick = () => {
+                    document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+                    slot.classList.add('active');
+                    document.getElementById('timeVal').value = timeStr;
+                };
+                container.appendChild(slot);
+            }
+        }
+        function sendBooking() {
+            const name = document.getElementById('custName').value;
+            const day = document.getElementById('dayVal').value;
+            const time = document.getElementById('timeVal').value;
+            const barber = document.getElementById('barberVal').value;
+            if(!name || !time) return alert("أكمل البيانات يا فنان!");
+            let storageKey = `res_${day}_${barber}`;
+            let booked = JSON.parse(localStorage.getItem(storageKey) || "[]");
+            if (!booked.includes(time)) {
+                booked.push(time);
+                localStorage.setItem(storageKey, JSON.stringify(booked));
+            }
+            loadSlots();
+            const msg = `حجز جديد:%0Aالاسم: ${name}%0Aالحلاق: ${barber}%0Aالموعد: ${day} الساعة ${time}`;
+            window.open(`https://wa.me/201027842141?text=${msg}`);
+        }
+
+        // --- أكواد أبلكيشن الحسابات ---
+        let accountsDB = JSON.parse(localStorage.getItem('mosaad_acc')) || [];
+        let currentBarber = "";
+        function openStaffApp() { document.getElementById('staff-layer').style.display='block'; }
+        function closeStaffApp() { document.getElementById('staff-layer').style.display='none'; }
+        function backToLogin() { document.getElementById('app-work').style.display='none'; document.getElementById('app-login').style.display='block'; }
+        function backToWork() { document.getElementById('app-admin').style.display='none'; document.getElementById('app-work').style.display='block'; }
+        
+        function appLogin(name) {
+            let p = prompt(`كلمة السر لـ ${name}:`);
+            if(p === (name==='محمد'?'1397':name==='محمود'?'1593':'5050')) {
+                currentBarber = name;
+                document.getElementById('app-login').style.display='none';
+                document.getElementById('app-work').style.display='block';
+                document.getElementById('welcome-msg').innerText = "يا مراحب يا " + name;
+                document.getElementById('admin-btn').style.display = (name==='مسعد') ? 'block' : 'none';
+                refreshUserTotal();
+            } else { alert("غلط يا برنس!"); }
+        }
+
+        function saveMoney() {
+            let c = document.getElementById('w-cust'), a = document.getElementById('w-amt');
+            if(!c.value || !a.value) return;
+            accountsDB.push({b:currentBarber, c:c.value, a:parseFloat(a.value), t:new Date().toLocaleTimeString('ar-EG'), d:new Date().toDateString()});
+            localStorage.setItem('mosaad_acc', JSON.stringify(accountsDB));
+            c.value=""; a.value=""; refreshUserTotal(); alert("تم الحفظ ✅");
+        }
+
+        function refreshUserTotal() {
+            let sum = accountsDB.filter(r => r.b === currentBarber && r.d === new Date().toDateString()).reduce((s,r)=>s+r.a,0);
+            document.getElementById('u-total').innerText = sum;
+        }
+
+        function openAdmin() {
+            let p = prompt("باسورد الخزنة:");
+            if(p === '7007') {
+                document.getElementById('app-work').style.display='none';
+                document.getElementById('app-admin').style.display='block';
+                let sum = accountsDB.reduce((s,r)=>s+r.a,0);
+                document.getElementById('total-money').innerText = sum + " ج.م";
+                let html = "";
+                accountsDB.slice().reverse().forEach(r => { html += `<tr><td>${r.b}</td><td>${r.a}</td><td>${r.t}</td></tr>`; });
+                document.getElementById('admin-log').innerHTML = html;
+            }
+        }
+
+        function clearAllData() { if(confirm("هتصفر الخزنة؟")) { localStorage.clear(); location.reload(); } }
+
+        window.onload = generateDays;
+    </script>
+
+</body>
+</html>
