@@ -1,120 +1,74 @@
-let allData = JSON.parse(localStorage.getItem('mosaad_pro_db')) || [];
-let activeUser = "";
-const PASSWORDS = { 'محمد': '11', 'محمود': '22', 'مسعد': '33', 'owner': '00' };
+let db = JSON.parse(localStorage.getItem('mosad_mega_safe')) || [];
+let user = "";
 
-// تحديث الساعة
-setInterval(() => {
-    document.getElementById('live-time').innerText = "🕒 " + new Date().toLocaleTimeString('ar-EG');
-}, 1000);
+const PASSWORDS = { 'مسعد': '7007', 'محمد': '1397', 'محمود': '1593' };
 
-// دخول الحلاقين
-function openLogin(user) {
-    let pass = prompt(`أهلاً يا ${user}.. دخل باسوردك:`);
-    if (pass === PASSWORDS[user]) {
-        activeUser = user;
-        document.getElementById('login-screen').style.display = "none";
-        document.getElementById('barber-screen').style.display = "block";
-        document.getElementById('user-display').innerText = "🧔 " + activeUser;
-        
-        // إظهار زر الإدارة لمسعد فقط
-        document.getElementById('admin-access-btn').style.display = (activeUser === 'مسعد') ? "block" : "none";
-        
-        updateUserDailyTotal();
-    } else { alert("عفواً.. الباسورد غلط!"); }
+function login(name) {
+    let p = prompt(`قولنا سرك يا ${name} (الباسورد):`);
+    if (p === PASSWORDS[name]) {
+        user = name;
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('work-screen').classList.remove('hidden');
+        document.getElementById('active-user').innerText = "يا مراحب يا " + name;
+        document.getElementById('active-img').src = name + ".jpg";
+        if(name === 'مسعد') document.getElementById('admin-btn').classList.remove('hidden');
+        updateUserTotal();
+    } else { alert("لا يا برنس.. الباسورد ملوش علاقة بالحقيقة!"); }
 }
 
-// دخول الإدارة (الأونر)
-function openAdminPanel() {
-    let pass = prompt("باسورد الخزنة (كابتن مسعد):");
-    if (pass === PASSWORDS['owner']) {
-        document.getElementById('barber-screen').style.display = "none";
-        document.getElementById('admin-screen').style.display = "block";
-        loadAdminData();
-    } else { alert("ممنوع الدخول لغير الكابتن!"); }
+function saveData() {
+    let amt = document.getElementById('amount').value;
+    let name = document.getElementById('cust-name').value;
+    if (!amt) return alert("اكتب المبلغ.. إحنا بنلعب؟");
+
+    db.push({
+        barber: user,
+        customer: name || "زبون طاير",
+        price: parseFloat(amt),
+        time: new Date().getTime() // الوقت بالثانية
+    });
+
+    localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
+    document.getElementById('amount').value = "";
+    document.getElementById('cust-name').value = "";
+    updateUserTotal();
+    alert("اتسجلت يا وحش.. رزق وجالك ✅");
 }
 
-function saveWork() {
-    const name = document.getElementById('cust-name');
-    const price = document.getElementById('cust-price');
-    if (!name.value || !price.value) return alert("املا البيانات!");
+function updateUserTotal() {
+    let today = new Date().toDateString();
+    let sum = db.filter(r => r.barber === user && new Date(r.time).toDateString() === today)
+                .reduce((s, r) => s + r.price, 0);
+    document.getElementById('u-today').innerText = sum;
+}
 
-    const record = {
-        barber: activeUser,
-        customer: name.value,
-        amount: parseFloat(price.value),
-        time: new Date().toISOString()
-    };
-
-    allData.push(record);
-    localStorage.setItem('mosaad_pro_db', JSON.stringify(allData));
+function showAdmin() {
+    let p = prompt("باسورد الخزنة (المدير بس):");
+    if (p !== '5050') return alert("المنطقة دي خطر عليك يا برنس!");
     
-    // تأثير اهتزاز للموبايل عند الحفظ
-    if (window.navigator.vibrate) window.navigator.vibrate([50, 30, 50]);
+    document.getElementById('work-screen').classList.add('hidden');
+    document.getElementById('admin-screen').classList.remove('hidden');
 
-    name.value = ""; price.value = "";
-    alert("تم الحفظ بنجاح.. الله ينور! ✅");
-    updateUserDailyTotal();
-}
+    let now = new Date().getTime();
+    const filterByTime = (ms) => db.filter(r => (now - r.time) < ms).reduce((s, r) => s + r.price, 0);
 
-function updateUserDailyTotal() {
-    const today = new Date().toDateString();
-    const total = allData
-        .filter(r => r.barber === activeUser && new Date(r.time).toDateString() === today)
-        .reduce((sum, r) => sum + r.amount, 0);
-    document.getElementById('user-daily-total').innerText = total;
-}
+    document.getElementById('s-day').innerText = filterByTime(86400000);
+    document.getElementById('s-week').innerText = filterByTime(604800000);
+    document.getElementById('s-month').innerText = filterByTime(2592000000);
+    document.getElementById('s-year').innerText = filterByTime(31536000000);
 
-function loadAdminData() {
-    const grandTotal = allData.reduce((sum, r) => sum + r.amount, 0);
-    document.getElementById('grand-total').innerText = grandTotal;
     let html = "";
-    allData.slice().reverse().forEach(r => {
-        html += `<tr><td>${r.barber}</td><td>${r.amount} ج.م</td><td>${new Date(r.time).toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit'})}</td></tr>`;
+    db.slice().reverse().forEach(r => {
+        let timeLabel = new Date(r.time).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        html += `<div class="log-item">
+            <span><b>${r.barber}</b>: ${r.price} ج</span>
+            <span style="color:gray">${timeLabel}</span>
+        </div>`;
     });
     document.getElementById('log-body').innerHTML = html;
 }
 
-function viewReport(type) {
-    const now = new Date();
-    let filtered = allData.filter(r => {
-        const d = new Date(r.time);
-        if (type === 'day') return d.toDateString() === now.toDateString();
-        if (type === 'week') return (now - d) / (1000*60*60*24) <= 7;
-        if (type === 'month') return d.getMonth() === now.getMonth();
-        if (type === 'year') return d.getFullYear() === now.getFullYear();
-    });
-    let sum = filtered.reduce((a, b) => a + b.amount, 0);
-    document.getElementById('report-output').innerHTML = `إجمالي ${type}: <span style="color:var(--gold)">${sum} ج.م</span>`;
-}
-
-function logout() { location.reload(); }
-function closeAdmin() { 
-    document.getElementById('admin-screen').style.display = "none";
-    document.getElementById('barber-screen').style.display = "block";
-}
-function wipeData() {
-    if(confirm("سيتم مسح كل الحسابات نهائياً.. متأكد؟")) { localStorage.clear(); location.reload(); }
-}
-const cacheName = 'mosad-v1';
-const assets = ['/', '/index.html', '/style.css', '/script.js'];
-
-self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(cacheName).then(cache => {
-      cache.addAll(assets);
-    })
-  );
-});
-
-self.addEventListener('fetch', e => {
-  e.respondWith(
-    fetch(e.request).catch(() => caches.match(e.request))
-  );
-});
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('App Ready!'))
-      .catch(err => console.log('App Failed', err));
-  });
+function hideAdmin() {
+    document.getElementById('admin-screen').classList.add('hidden');
+    document.getElementById('work-screen').classList.remove('hidden');
 }
