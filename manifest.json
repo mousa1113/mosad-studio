@@ -1,16 +1,10 @@
 {
-  "name": "صالون كابتن مسعد - Mosad Studio",
-  "short_name": "Mosad Studio",
-  "description": "صالون كابتن مسعد - اللوك بتاعك مسؤوليتنا",
-  "start_url": "/",
+  "name": "خزنة ملوك الشياكة",
+  "short_name": "الخزنة",
+  "start_url": "index.html",
   "display": "standalone",
-  "background_color": "#0d0d0d",
+  "background_color": "#0a0a0a",
   "theme_color": "#d4af37",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/100/100329.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
-  ]
+  "icons": [{ "src": "مسعد.jpg", "sizes": "512x512", "type": "image/jpeg" }]
 }
+
