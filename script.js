@@ -1,44 +1,32 @@
+// استعادة البيانات والباسوردات من الذاكرة أو وضع القيم الافتراضية
 let db = JSON.parse(localStorage.getItem('mosad_mega_safe')) || [];
-let user = "";
-
-// الباسوردات اللي إنت حددتها
-const PASSWORDS = { 
+let PASSWORDS = JSON.parse(localStorage.getItem('mosad_passwords')) || { 
     'مسعد': '7007', 
     'محمد': '1397', 
     'محمود': '1593' 
 };
+let user = "";
 
 function login(name) {
     let p = prompt(`قولنا سرك يا ${name} (الباسورد):`);
     if (p === PASSWORDS[name]) {
         user = name;
-        
-        // بنخفي شاشة الدخول ونظهر شاشة الشغل
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('work-screen').classList.remove('hidden');
-        
         document.getElementById('active-user').innerText = "يا مراحب يا " + name;
         document.getElementById('active-img').src = name + ".jpg";
-
-        // بنخفي الزرار الأول عشان نضمن الخصوصية الكاملة
-        document.getElementById('admin-btn').classList.add('hidden');
-
-        // لو اللي داخل "مسعد" بس.. الزرار يظهرله
-        if (name === 'مسعد') {
-            document.getElementById('admin-btn').classList.remove('hidden');
-        }
-
+        
+        // زرار الإدارة يظهر لمسعد بس
+        document.getElementById('admin-btn').classList.toggle('hidden', name !== 'مسعد');
+        
         updateUserTotal();
-    } else { 
-        alert("لا يا برنس.. الباسورد غلط، ركز شوية!"); 
-    }
+    } else { alert("لا يا برنس.. الباسورد غلط!"); }
 }
 
 function saveData() {
     let amt = document.getElementById('amount').value;
     let name = document.getElementById('cust-name').value;
-    
-    if (!amt || amt <= 0) return alert("اكتب الفلوس صح يا معلم، متهزرش!");
+    if (!amt || amt <= 0) return alert("اكتب الفلوس صح يا معلم!");
 
     db.push({
         barber: user,
@@ -50,9 +38,8 @@ function saveData() {
     localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
     document.getElementById('amount').value = "";
     document.getElementById('cust-name').value = "";
-    
     updateUserTotal();
-    alert("اتسجلت يا وحش.. رزق وجالك ✅");
+    alert("اتسجلت يا وحش ✅");
 }
 
 function updateUserTotal() {
@@ -63,23 +50,13 @@ function updateUserTotal() {
 }
 
 function showAdmin() {
-    // باسورد الخزنة السري اللي إنت حددته (5050)
-    let p = prompt("باسورد الخزنة السري (للمدير بس):");
-    if (p !== '5050') {
-        alert("المنطقة دي خطر عليك يا برنس.. ابعد عنها!");
-        return;
-    }
+    let p = prompt("باسورد الخزنة السري (المدير بس):");
+    if (p !== '5050') return alert("المنطقة دي خطر عليك!");
     
     document.getElementById('work-screen').classList.add('hidden');
     document.getElementById('admin-screen').classList.remove('hidden');
 
-    refreshAdminStats();
-}
-
-function refreshAdminStats() {
     let now = new Date().getTime();
-    
-    // حسابات دقيقة بالثانية (يومي، أسبوعي، شهري، سنوي)
     const filterByTime = (ms) => db.filter(r => (now - r.time) < ms).reduce((s, r) => s + r.price, 0);
 
     document.getElementById('s-day').innerText = filterByTime(86400000); 
@@ -89,38 +66,29 @@ function refreshAdminStats() {
 
     let html = "";
     db.slice().reverse().forEach(r => {
-        let dateObj = new Date(r.time);
-        let timeLabel = dateObj.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
-        let dateLabel = dateObj.toLocaleDateString('ar-EG');
-        
-        html += `<div class="log-item" style="border-bottom: 1px solid #222; padding: 10px 0;">
-            <span><b>${r.barber}</b>: ${r.price} ج <br><small style="color:#aaa">${r.customer}</small></span>
-            <span style="color:gray; font-size: 10px; text-align: left;">${dateLabel}<br>${timeLabel}</span>
-        </div>`;
+        let t = new Date(r.time).toLocaleTimeString('ar-EG');
+        html += `<div class="log-item"><span><b>${r.barber}</b>: ${r.price} ج</span><span style="color:gray">${t}</span></div>`;
     });
-
-    // إضافة زرار التصفير في آخر القائمة
-    html += `
-        <button onclick="clearAllData()" style="width:100%; padding:15px; background:#e74c3c; color:white; border:none; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;">
-            تصفير الخزنة نهائياً 🧹
-        </button>
-    `;
-
     document.getElementById('log-body').innerHTML = html;
 }
 
-// دالة تصفير البيانات
+// دالة تغيير الباسورد (لمسعد فقط جوه اللوحة)
+function changePass(targetUser) {
+    let newPass = prompt(`اكتب الباسورد الجديد لـ ${targetUser}:`);
+    if (newPass && newPass.length >= 2) {
+        PASSWORDS[targetUser] = newPass;
+        localStorage.setItem('mosad_passwords', JSON.stringify(PASSWORDS));
+        alert(`تم تغيير باسورد ${targetUser} بنجاح ✅`);
+    } else {
+        alert("الباسورد قصير اوي يا كنج!");
+    }
+}
+
 function clearAllData() {
-    let confirm1 = confirm("إنت متأكد إنك عايز تصفر الخزنة؟ كل الحسابات هتتمسح!");
-    if (confirm1) {
-        let confirm2 = confirm("آخر مرة بسألك.. مفيش رجوع في القرار ده، نمسح؟");
-        if (confirm2) {
-            db = [];
-            localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
-            alert("الخزنة اتصفرت.. نبدأ على نضافة يا مدير ✅");
-            hideAdmin();
-            location.reload();
-        }
+    if (confirm("هتصفر الخزنة؟ مفيش رجوع!") && confirm("تأكيد نهائي؟")) {
+        db = [];
+        localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
+        location.reload();
     }
 }
 
