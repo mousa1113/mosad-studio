@@ -9,7 +9,7 @@ body { background: var(--dark); color: #fff; font-family: 'Cairo', sans-serif; m
 
 .app-container { padding: 25px; max-width: 450px; margin: auto; }
 header { text-align: center; margin-bottom: 30px; }
-.glitch { font-size: 2.5rem; font-weight: 900; letter-spacing: 2px; }
+.glitch { font-size: 2.5rem; font-weight: 900; }
 .glitch span { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
 
 .section-box {
@@ -20,40 +20,35 @@ header { text-align: center; margin-bottom: 30px; }
 
 .barbers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 20px; }
 .barber-item { text-align: center; cursor: pointer; transition: 0.3s; }
-.barber-item:hover { transform: translateY(-10px); }
-.avatar { 
-    width: 80px; height: 80px; border-radius: 20px; margin: auto; 
-    border: 2px solid var(--gold); overflow: hidden; transform: rotate(5deg);
-}
-.avatar img { width: 100%; height: 100%; object-fit: cover; transform: rotate(-5deg); }
+.avatar { width: 80px; height: 80px; border-radius: 20px; margin: auto; border: 2px solid var(--gold); overflow: hidden; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
 
 .main-form { margin-top: 20px; }
-label { display: block; margin-bottom: 8px; font-weight: bold; color: var(--gold); }
+label { display: block; margin-bottom: 8px; color: var(--gold); font-weight: bold; }
 input {
     width: 100%; padding: 18px; background: rgba(0,0,0,0.5); border: 2px solid #222;
-    border-radius: 15px; color: #fff; margin-bottom: 20px; font-size: 1rem; text-align: center;
+    border-radius: 15px; color: #fff; margin-bottom: 20px; font-size: 1rem; text-align: center; box-sizing: border-box;
 }
-input:focus { border-color: var(--gold); outline: none; box-shadow: 0 0 10px rgba(212,175,55,0.2); }
 
 .btn-glow {
     width: 100%; padding: 20px; background: linear-gradient(90deg, #d4af37, #f1c40f);
     border: none; border-radius: 15px; font-weight: 900; font-size: 1.1rem; cursor: pointer;
-    box-shadow: 0 10px 20px rgba(212,175,55,0.3);
 }
 
-.money-val { font-size: 2.5rem; font-weight: 900; color: #2ecc71; margin-top: 10px; }
-.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.money-val { font-size: 2.5rem; font-weight: 900; color: #2ecc71; }
+.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;}
 .report-card { background: #111; padding: 15px; border-radius: 15px; text-align: center; border-bottom: 3px solid #333; }
-.report-card h3 { font-size: 0.8rem; margin: 0; color: gray; }
-.report-card span { font-size: 1.3rem; font-weight: 900; display: block; }
+.report-card span { font-size: 1.3rem; font-weight: 900; display: block; color: var(--gold); }
 
-.history-box { margin-top: 20px; background: #000; border-radius: 20px; padding: 15px; }
+.admin-tools { margin: 20px 0; padding: 15px; background: rgba(255,255,255,0.03); border-radius: 20px; }
+.pass-grid { display: grid; gap: 10px; }
+.pass-grid button { background: #222; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 10px; cursor: pointer; font-family: 'Cairo'; }
+
+.history-box { background: #000; border-radius: 20px; padding: 15px; margin-top: 20px; }
 .list-wrapper { max-height: 200px; overflow-y: auto; }
-.log-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #111; font-size: 0.8rem; }
+.log-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #111; font-size: 0.8rem; }
 
 .hidden { display: none; }
-.fade-in { animation: fadeIn 0.6s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-
-.btn-special { background: none; border: 1px solid var(--gold); color: var(--gold); width: 100%; padding: 15px; border-radius: 15px; margin-top: 15px; font-weight: bold; }
-.btn-out { background: transparent; color: #666; border: none; width: 100%; margin-top: 15px; cursor: pointer; }
+.btn-special { background: none; border: 1px solid var(--gold); color: var(--gold); width: 100%; padding: 15px; border-radius: 15px; margin-top: 15px; font-weight: bold; cursor: pointer; }
+.btn-clear { width: 100%; padding: 15px; background: #e74c3c; color: #fff; border: none; border-radius: 15px; margin-top: 20px; font-weight: bold; cursor: pointer; }
+.btn-out { background: transparent; color: #666; border: none; width: 100%; margin-top: 15px; cursor: pointer; font-family: 'Cairo'; }
