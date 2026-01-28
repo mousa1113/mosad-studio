@@ -1,6 +1,7 @@
 let db = JSON.parse(localStorage.getItem('mosad_mega_safe')) || [];
 let user = "";
 
+// الباسوردات اللي إنت حددتها
 const PASSWORDS = { 
     'مسعد': '7007', 
     'محمد': '1397', 
@@ -12,17 +13,17 @@ function login(name) {
     if (p === PASSWORDS[name]) {
         user = name;
         
-        // خفينا شاشة الدخول وظهرنا شاشة الشغل
+        // بنخفي شاشة الدخول ونظهر شاشة الشغل
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('work-screen').classList.remove('hidden');
         
         document.getElementById('active-user').innerText = "يا مراحب يا " + name;
         document.getElementById('active-img').src = name + ".jpg";
 
-        // الحتة دي هي السحر: الزرار بيختفي الأول
+        // بنخفي الزرار الأول عشان نضمن الخصوصية الكاملة
         document.getElementById('admin-btn').classList.add('hidden');
 
-        // لو اللي داخل هو "مسعد" بس.. الزرار يظهرله
+        // لو اللي داخل "مسعد" بس.. الزرار يظهرله
         if (name === 'مسعد') {
             document.getElementById('admin-btn').classList.remove('hidden');
         }
@@ -62,7 +63,7 @@ function updateUserTotal() {
 }
 
 function showAdmin() {
-    // زيادة تأكيد: بنسأله تاني على باسورد الخزنة (5050)
+    // باسورد الخزنة السري اللي إنت حددته (5050)
     let p = prompt("باسورد الخزنة السري (للمدير بس):");
     if (p !== '5050') {
         alert("المنطقة دي خطر عليك يا برنس.. ابعد عنها!");
@@ -72,15 +73,19 @@ function showAdmin() {
     document.getElementById('work-screen').classList.add('hidden');
     document.getElementById('admin-screen').classList.remove('hidden');
 
+    refreshAdminStats();
+}
+
+function refreshAdminStats() {
     let now = new Date().getTime();
     
-    // فلترة الحسابات بالثانية
+    // حسابات دقيقة بالثانية (يومي، أسبوعي، شهري، سنوي)
     const filterByTime = (ms) => db.filter(r => (now - r.time) < ms).reduce((s, r) => s + r.price, 0);
 
-    document.getElementById('s-day').innerText = filterByTime(86400000); // 24 ساعة
-    document.getElementById('s-week').innerText = filterByTime(604800000); // 7 أيام
-    document.getElementById('s-month').innerText = filterByTime(2592000000); // 30 يوم
-    document.getElementById('s-year').innerText = filterByTime(31536000000); // سنة كاملة
+    document.getElementById('s-day').innerText = filterByTime(86400000); 
+    document.getElementById('s-week').innerText = filterByTime(604800000); 
+    document.getElementById('s-month').innerText = filterByTime(2592000000); 
+    document.getElementById('s-year').innerText = filterByTime(31536000000); 
 
     let html = "";
     db.slice().reverse().forEach(r => {
@@ -88,12 +93,35 @@ function showAdmin() {
         let timeLabel = dateObj.toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
         let dateLabel = dateObj.toLocaleDateString('ar-EG');
         
-        html += `<div class="log-item">
-            <span><b>${r.barber}</b>: ${r.price} ج <br><small>${r.customer}</small></span>
+        html += `<div class="log-item" style="border-bottom: 1px solid #222; padding: 10px 0;">
+            <span><b>${r.barber}</b>: ${r.price} ج <br><small style="color:#aaa">${r.customer}</small></span>
             <span style="color:gray; font-size: 10px; text-align: left;">${dateLabel}<br>${timeLabel}</span>
         </div>`;
     });
+
+    // إضافة زرار التصفير في آخر القائمة
+    html += `
+        <button onclick="clearAllData()" style="width:100%; padding:15px; background:#e74c3c; color:white; border:none; border-radius:10px; margin-top:20px; font-weight:bold; cursor:pointer;">
+            تصفير الخزنة نهائياً 🧹
+        </button>
+    `;
+
     document.getElementById('log-body').innerHTML = html;
+}
+
+// دالة تصفير البيانات
+function clearAllData() {
+    let confirm1 = confirm("إنت متأكد إنك عايز تصفر الخزنة؟ كل الحسابات هتتمسح!");
+    if (confirm1) {
+        let confirm2 = confirm("آخر مرة بسألك.. مفيش رجوع في القرار ده، نمسح؟");
+        if (confirm2) {
+            db = [];
+            localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
+            alert("الخزنة اتصفرت.. نبدأ على نضافة يا مدير ✅");
+            hideAdmin();
+            location.reload();
+        }
+    }
 }
 
 function hideAdmin() {
