@@ -3,99 +3,95 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Management System | Mosad Studio</title>
+    <title>MOSAD STUDIO | Ultimate Report System</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="studio-theme">
-    <div class="main-overlay"></div>
-    
-    <header class="studio-header">
-        <div class="brand">MOSAD <span>STUDIO</span></div>
-        <div id="clock" class="digital-clock">00:00:00</div>
-    </header>
+<body class="pro-dark-theme">
+    <div class="header-glass">
+        <div class="logo">MOSAD <span>STUDIO</span></div>
+        <div id="clock" class="clock-digital">00:00:00</div>
+    </div>
 
-    <main class="app-body">
-        <section id="chairs-screen" class="screen active">
-            <div class="grid-container" id="chairs-render"></div>
-            <div class="bottom-dock">
-                <button class="dock-item att" onclick="openModal('attendance-modal')">
-                    <span class="icon">🕒</span> الحضور
-                </button>
-                <button class="dock-item vault" onclick="openModal('admin-auth-modal')">
-                    <span class="icon">🛡️</span> الإدارة
-                </button>
+    <main class="content-area">
+        <section id="view-home" class="view active">
+            <div id="grid-chairs" class="grid-chairs"></div>
+            <div class="bottom-controls">
+                <button class="btn-glow att-btn" onclick="openPopup('pop-att')">🕒 الحضور</button>
+                <button class="btn-glow admin-btn" onclick="openPopup('pop-auth')">🛡️ الإدارة</button>
             </div>
         </section>
 
-        <section id="work-screen" class="screen">
-            <div class="work-glass-card">
-                <h2 id="chair-label">الكرسي 1</h2>
-                <div class="form-creative">
-                    <div class="input-unit">
-                        <input type="text" id="cust-name" placeholder=" " required>
-                        <label>اسم العميل / الرقم</label>
+        <section id="view-work" class="view">
+            <div class="creative-form-card">
+                <div class="card-glow"></div>
+                <h2 id="current-chair-name">الكرسي</h2>
+                <div class="fancy-inputs">
+                    <div class="input-box">
+                        <input type="text" id="in-cust" required>
+                        <span>اسم العميل / الرقم</span>
                     </div>
-                    <div class="input-unit">
-                        <input type="number" id="cust-price" placeholder=" " required inputmode="numeric">
-                        <label>المبلغ (ج.م)</label>
+                    <div class="input-box">
+                        <input type="number" id="in-amt" required inputmode="numeric">
+                        <span>المبلغ (EGP)</span>
                     </div>
                 </div>
-                <button class="btn-submit-pro" onclick="processSale()">تأكيد العملية ⚡</button>
-                <div class="chair-stat">إجمالي اليوم: <span id="chair-day-total">0</span></div>
-                <button class="btn-return" onclick="showScreen('chairs-screen')">رجوع</button>
+                <div class="action-buttons">
+                    <button class="btn-confirm" onclick="confirmSale()">تأكيد العملية ⚡</button>
+                    <button class="btn-back-home" onclick="showView('view-home')">رجوع</button>
+                </div>
+                <div class="chair-daily-sum">إيراد اليوم: <b id="chair-sum-val">0</b></div>
             </div>
         </section>
     </main>
 
-    <div class="modal-layer" id="attendance-modal">
-        <div class="modal-card">
-            <h3>تسجيل حضور</h3>
-            <input type="text" id="staff-user" placeholder="اسم الموظف">
-            <button class="btn-modal-act" onclick="confirmAtt()">تسجيل الآن</button>
-            <button class="btn-modal-close" onclick="closeModal('attendance-modal')">إلغاء</button>
+    <div id="pop-auth" class="overlay-popup">
+        <div class="popup-box">
+            <h3>أمن النظام</h3>
+            <div class="input-box">
+                <input type="password" id="pass-field" required>
+                <span>كلمة السر</span>
+            </div>
+            <div class="popup-actions">
+                <button class="btn-enter" onclick="checkAuth()">دخول</button>
+                <button class="btn-cancel" onclick="closePopup('pop-auth')">إلغاء</button>
+            </div>
         </div>
     </div>
 
-    <div class="modal-layer" id="admin-auth-modal">
-        <div class="modal-card">
-            <h3>دخول الإدارة</h3>
-            <input type="password" id="admin-key" placeholder="كلمة المرور">
-            <button class="btn-modal-act" onclick="authAdmin()">دخول</button>
-            <button class="btn-modal-close" onclick="closeModal('admin-auth-modal')">إلغاء</button>
-        </div>
-    </div>
-
-    <div id="admin-dashboard" class="dashboard-overlay">
-        <div class="dash-head">
-            <h2>إدارة المحل</h2>
-            <button class="dash-exit" onclick="closeDashboard()">×</button>
+    <div id="admin-panel" class="admin-panel">
+        <div class="admin-header">
+            <h2>لوحة التقارير الذكية</h2>
+            <button class="close-panel" onclick="closeAdmin()">×</button>
         </div>
 
-        <div class="chair-selector-tabs" id="dash-tabs"></div>
-
-        <div class="stats-box-grid">
-            <div class="stat-bubble" onclick="printData('day')"><span>يومي</span><b id="d-total">0</b></div>
-            <div class="stat-bubble" onclick="printData('week')"><span>أسبوعي</span><b id="w-total">0</b></div>
-            <div class="stat-bubble" onclick="printData('month')"><span>شهري</span><b id="m-total">0</b></div>
-            <div class="stat-bubble gold" onclick="printData('year')"><span>سنوي</span><b id="y-total">0</b></div>
+        <div class="period-selector">
+            <button class="p-btn" onclick="showReportOptions('يومي')">يومي</button>
+            <button class="p-btn" onclick="showReportOptions('أسبوعي')">أسبوعي</button>
+            <button class="p-btn" onclick="showReportOptions('شهري')">شهري</button>
+            <button class="p-btn gold" onclick="showReportOptions('سنوي')">سنوي</button>
         </div>
 
-        <div class="data-logs">
-            <div class="log-section">
-                <div class="log-h">💰 سجل المبيعات <button onclick="resetData('money')">مسح</button></div>
-                <div id="sales-log" class="v-scroll"></div>
+        <div id="report-sub-menu" class="sub-menu hidden">
+            <h4 id="report-type-title">تقرير يومي</h4>
+            <div id="report-chair-btns" class="report-chairs"></div>
+        </div>
+
+        <div class="logs-grid">
+            <div class="log-tile">
+                <div class="tile-h">💰 المبيعات <button onclick="resetData('sales')">تصفير</button></div>
+                <div id="sales-log" class="list-scroll"></div>
             </div>
-            <div class="log-section">
-                <div class="log-h">🕒 سجل الحضور <button onclick="resetData('att')">مسح</button></div>
-                <div id="att-log" class="v-scroll"></div>
+            <div class="log-tile">
+                <div class="tile-h">🕒 الحضور <button onclick="resetData('att')">تصفير</button></div>
+                <div id="att-log" class="list-scroll"></div>
             </div>
         </div>
 
-        <div class="dash-footer">
-            <button class="footer-btn add" onclick="addChair()">➕ إضافة</button>
-            <button class="footer-btn del" onclick="delChair()">➖ حذف</button>
-            <button class="footer-btn print" onclick="window.print()">🖨️ طباعة</button>
+        <div class="admin-footer-btns">
+            <button class="f-btn" onclick="addChair()">+ إضافة كرسي</button>
+            <button class="f-btn red" onclick="delChair()">- حذف كرسي</button>
+            <button class="f-btn print" onclick="window.print()">🖨️ طباعة السجل</button>
         </div>
     </div>
 
