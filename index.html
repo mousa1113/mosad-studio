@@ -3,81 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSAD STUDIO | Ultimate Version</title>
+    <title>MOSAD STUDIO | Creative Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="dark-theme">
-    <div class="glow-overlay"></div>
-    
-    <header class="top-header">
-        <div class="neon-logo">MOSAD <span>STUDIO</span></div>
-        <div id="clock" class="neo-time">00:00:00</div>
-    </header>
+<body>
+    <div class="app-wrapper">
+        <header class="main-header">
+            <div class="logo">MOSAD <span>STUDIO</span></div>
+            <div id="clock" class="clock">00:00:00</div>
+        </header>
 
-    <main class="container">
-        <section id="home-view" class="view active">
-            <div class="chairs-grid" id="main-grid">
-                </div>
-            <div class="main-actions">
-                <button class="btn-neo pulse" onclick="recordAtt()">🕒 بصمة</button>
-                <button class="btn-neo gold" onclick="enterVault()">🛡️ الخزنة</button>
+        <section id="view-home" class="view active">
+            <div class="grid-layout" id="chairs-grid"></div>
+            <div class="bottom-nav">
+                <button class="nav-btn" onclick="openModal('att-modal')">🕒 بصمة</button>
+                <button class="nav-btn gold" onclick="openModal('auth-modal')">🛡️ الخزنة</button>
             </div>
         </section>
 
-        <section id="work-view" class="view">
-            <div class="glass-card">
-                <div class="card-head">
-                    <h2 id="current-chair">الكرسي 1</h2>
-                    <span class="status-dot">نشط</span>
-                </div>
+        <section id="view-chair-work" class="view">
+            <div class="work-card">
+                <h2 id="chair-title">الكرسي 1</h2>
                 <div class="creative-inputs">
-                    <div class="field">
-                        <input type="text" id="cust-name" placeholder=" " required>
-                        <label>اسم العميل / رقم الهاتف</label>
-                    </div>
-                    <div class="field">
-                        <input type="number" id="cust-amt" placeholder=" " required inputmode="numeric">
-                        <label>المبلغ (EGP)</label>
-                    </div>
+                    <input type="text" id="c-name" placeholder="اسم العميل">
+                    <input type="number" id="c-amt" placeholder="المبلغ" inputmode="numeric">
                 </div>
-                <button class="btn-confirm" onclick="saveTransaction()">تأكيد العملية ⚡</button>
-                <div class="daily-info">إيرادك اليوم: <b id="chair-sum">0</b> ج</div>
-                <button class="btn-exit" onclick="showHome()">🔙 رجوع للرئيسية</button>
+                <button class="confirm-btn" onclick="saveData()">تأكيد 💸</button>
+                <div class="daily-badge">إيراد اليوم: <span id="c-sum">0</span></div>
+                <button class="back-link" onclick="showView('view-home')">🔙 العودة</button>
             </div>
         </section>
-    </main>
+    </div>
 
-    <div id="vault-panel" class="vault-overlay">
+    <div id="auth-modal" class="modal">
+        <div class="modal-content">
+            <h3>دخول الإدارة</h3>
+            <input type="password" id="admin-pass" placeholder="••••">
+            <button onclick="checkAdmin()">دخول</button>
+            <button class="close-txt" onclick="closeModal('auth-modal')">إلغاء</button>
+        </div>
+    </div>
+
+    <div id="att-modal" class="modal">
+        <div class="modal-content">
+            <h3>تسجيل الحضور</h3>
+            <input type="text" id="staff-name" placeholder="اسم الموظف">
+            <button onclick="confirmAtt()">بصمة ✅</button>
+            <button class="close-txt" onclick="closeModal('att-modal')">إلغاء</button>
+        </div>
+    </div>
+
+    <div id="vault-panel" class="vault-panel">
         <div class="vault-header">
-            <h3>إحصائيات الإدارة</h3>
-            <button class="close-btn" onclick="closeVault()">✕</button>
+            <h2>الخزنة</h2>
+            <button class="exit-x" onclick="closeVault()">×</button>
+        </div>
+        
+        <div class="stats-row" id="stats-container">
+            <div class="s-circle"><span>يومي</span><b id="d-val">0</b></div>
+            <div class="s-circle"><span>أسبوعي</span><b id="w-val">0</b></div>
+            <div class="s-circle"><span>شهري</span><b id="m-val">0</b></div>
+            <div class="s-circle gold"><span>سنوي</span><b id="y-val">0</b></div>
         </div>
 
-        <div class="chair-tabs" id="tabs"></div>
-
-        <div class="stats-mini-grid">
-            <div class="mini-card" onclick="printFiltered('يومي')"><span>يومي</span><b id="v-day">0</b></div>
-            <div class="mini-card" onclick="printFiltered('أسبوعي')"><span>أسبوعي</span><b id="v-week">0</b></div>
-            <div class="mini-card" onclick="printFiltered('شهري')"><span>شهري</span><b id="v-month">0</b></div>
-            <div class="mini-card gold" onclick="printFiltered('سنوي')"><span>سنوي</span><b id="v-year">0</b></div>
-        </div>
-
-        <div class="data-split">
-            <div class="log-box">
-                <div class="log-h">💰 مبيعات <button onclick="clearDB('money')">مسح</button></div>
-                <div id="money-log" class="inner-scroll"></div>
+        <div class="logs-container">
+            <div class="log-tile">
+                <h4>💰 المبيعات <button onclick="clearLog('money')">🗑️</button></h4>
+                <div id="money-list" class="scroll-v"></div>
             </div>
-            <div class="log-box">
-                <div class="log-h">🕒 حضور <button onclick="clearDB('att')">مسح</button></div>
-                <div id="att-log" class="inner-scroll"></div>
+            <div class="log-tile">
+                <h4>🕒 الحضور <button onclick="clearLog('att')">🗑️</button></h4>
+                <div id="att-list" class="scroll-v"></div>
             </div>
         </div>
 
-        <div class="admin-btns">
-            <button class="tool-btn add" onclick="addChair()">➕ إضافة</button>
-            <button class="tool-btn del" onclick="delChair()">➖ حذف</button>
-            <button class="tool-btn print" onclick="window.print()">🖨️ طباعة</button>
+        <div class="vault-footer">
+            <button class="f-btn" onclick="addChair()">➕ إضافة</button>
+            <button class="f-btn red" onclick="delChair()">➖ حذف</button>
+            <button class="f-btn print" onclick="window.print()">🖨️ طباعة</button>
         </div>
     </div>
 
