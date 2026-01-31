@@ -1,129 +1,114 @@
-let db = JSON.parse(localStorage.getItem('ms_studio_v2')) || [];
-let att = JSON.parse(localStorage.getItem('ms_att_v2')) || [];
-let chairs = JSON.parse(localStorage.getItem('ms_chairs_v2')) || ["كرسي 1", "كرسي 2", "كرسي 3"];
+let db = JSON.parse(localStorage.getItem('ms_ultimate_db')) || [];
+let att = JSON.parse(localStorage.getItem('ms_ultimate_att')) || [];
+let chairs = JSON.parse(localStorage.getItem('ms_ultimate_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
 let currentChair = "";
-let filterChair = "الكل";
+let currentFilter = "الكل";
 
 window.onload = () => {
-    renderMainGrid();
+    renderGrid();
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('ar-EG'); }, 1000);
 };
 
-function renderMainGrid() {
+function renderGrid() {
     document.getElementById('main-grid').innerHTML = chairs.map(c => `
-        <div class="chair-card" onclick="openEntry('${c}')"><h3>${c}</h3></div>
+        <div class="chair-box-creative" onclick="openChair('${c}')">
+            <h3>${c}</h3>
+            <div class="spark"></div>
+        </div>
     `).join('');
 }
 
-function openEntry(name) {
+function openChair(name) {
     currentChair = name;
-    document.getElementById('active-chair-name').innerText = name;
-    switchView('entry-view');
+    document.getElementById('current-chair').innerText = name;
+    switchView('work-view');
     updateChairSum();
 }
 
-function saveOp() {
-    let amt = document.getElementById('cash-amt').value;
-    let info = document.getElementById('cust-info').value || "عميل";
+function saveTransaction() {
+    let amt = document.getElementById('cust-amt').value;
+    let name = document.getElementById('cust-name').value || "عميل";
     if(!amt) return;
     db.push({
         chair: currentChair,
-        cust: info,
-        amt: parseFloat(amt),
+        cust: name,
+        price: parseFloat(amt),
         ts: new Date().getTime(),
-        fullTime: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'}),
+        timeStr: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'}),
         date: new Date().toLocaleDateString('ar-EG')
     });
-    localStorage.setItem('ms_studio_v2', JSON.stringify(db));
-    document.getElementById('cash-amt').value = "";
-    document.getElementById('cust-info').value = "";
+    localStorage.setItem('ms_ultimate_db', JSON.stringify(db));
+    document.getElementById('cust-amt').value = "";
+    document.getElementById('cust-name').value = "";
     updateChairSum();
-    alert("تم التسجيل بالثانية والدقيقة ✅");
+    alert("تم الحفظ بنجاح ✅");
 }
 
-function openVault() {
+function enterVault() {
     if(prompt("باسورد الإدارة:") === '5050') {
         document.getElementById('vault-panel').style.display = 'block';
-        renderVaultTabs();
-        loadVaultStats();
+        renderTabs();
+        loadVault();
     }
 }
 
-function renderVaultTabs() {
-    let html = `<button class="tab-btn active" onclick="setFilter('الكل')">الكل</button>`;
-    html += chairs.map(c => `<button class="tab-btn" onclick="setFilter('${c}')">${c}</button>`).join('');
-    document.getElementById('chair-tabs').innerHTML = html;
+function renderTabs() {
+    let html = `<button class="t-btn active" onclick="setFilter('الكل')">الكل</button>`;
+    html += chairs.map(c => `<button class="t-btn" onclick="setFilter('${c}')">${c}</button>`).join('');
+    document.getElementById('tabs').innerHTML = html;
 }
 
 function setFilter(name) {
-    filterChair = name;
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    loadVaultStats();
+    currentFilter = name;
+    document.querySelectorAll('.t-btn').forEach(b => b.classList.toggle('active', b.innerText === name));
+    loadVault();
 }
 
-function loadVaultStats() {
-    let now = new Date().getTime();
-    let filteredDB = filterChair === "الكل" ? db : db.filter(x => x.chair === filterChair);
+function loadVault() {
+    const now = new Date().getTime();
+    const data = currentFilter === "الكل" ? db : db.filter(x => x.chair === currentFilter);
+    const sum = (ms) => data.filter(x => (now - x.ts) < ms).reduce((a, b) => a + b.price, 0);
 
-    const calc = (ms) => filteredDB.filter(x => (now - x.ts) < ms).reduce((a, b) => a + b.amt, 0);
+    document.getElementById('v-day').innerText = sum(86400000);
+    document.getElementById('v-week').innerText = sum(604800000);
+    document.getElementById('v-month').innerText = sum(2592000000);
+    document.getElementById('v-year').innerText = sum(31536000000);
 
-    document.getElementById('v-day').innerText = calc(86400000);
-    document.getElementById('v-week').innerText = calc(604800000);
-    document.getElementById('v-month').innerText = calc(2592000000);
-    document.getElementById('v-year').innerText = calc(31536000000);
-
-    document.getElementById('money-log').innerHTML = filteredDB.slice().reverse().map(i => `
-        <div style="border-bottom:1px solid #222; padding:5px;">
-            <b>${i.chair}</b> | ${i.amt}ج | ${i.cust} <br> <small>${i.date} - ${i.fullTime}</small>
-        </div>
+    document.getElementById('money-log').innerHTML = data.slice().reverse().map(i => `
+        <div class="log-item"><b>${i.chair}</b>|${i.price}ج|${i.cust}<br><small>${i.timeStr}</small></div>
     `).join('');
-
+    
     document.getElementById('att-log').innerHTML = att.slice().reverse().map(a => `
-        <div style="border-bottom:1px solid #222; padding:5px;">${a.name} | ${a.time}</div>
+        <div class="log-item">${a.name}<br><small>${a.time}</small></div>
     `).join('');
-}
-
-function printFiltered(period) {
-    alert("جارِ طباعة تقرير " + period + " لـ " + filterChair);
-    window.print();
 }
 
 function addChair() {
-    let n = prompt("اسم الكرسي:");
-    if(n) { chairs.push(n); localStorage.setItem('ms_chairs_v2', JSON.stringify(chairs)); renderMainGrid(); }
+    let n = prompt("اسم الكرسي الجديد:");
+    if(n) { chairs.push(n); localStorage.setItem('ms_ultimate_chairs', JSON.stringify(chairs)); renderGrid(); renderTabs(); }
 }
 
 function delChair() {
-    let n = prompt("اسم الكرسي للحذف:");
+    let n = prompt("اسم الكرسي لحذفه:");
+    if(["الكرسي 1", "الكرسي 2", "الكرسي 3"].includes(n)) return alert("ممنوع حذف الكراسي الأساسية!");
     chairs = chairs.filter(x => x !== n);
-    localStorage.setItem('ms_chairs_v2', JSON.stringify(chairs));
-    renderMainGrid();
-}
-
-function resetDB(type) {
-    if(confirm("تصفير السجل؟")) {
-        if(type==='money') { db=[]; localStorage.setItem('ms_studio_v2','[]'); }
-        else { att=[]; localStorage.setItem('ms_att_v2','[]'); }
-        loadVaultStats();
-    }
+    localStorage.setItem('ms_ultimate_chairs', JSON.stringify(chairs));
+    renderGrid(); renderTabs();
 }
 
 function switchView(id) {
     document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
     document.getElementById(id).classList.add('active');
 }
-function goHome() { switchView('home-view'); }
+function showHome() { switchView('home-view'); }
 function closeVault() { document.getElementById('vault-panel').style.display = 'none'; }
+function clearDB(t) { if(confirm("مسح؟")) { if(t==='money') db=[]; else att=[]; localStorage.setItem(t==='money'?'ms_ultimate_db':'ms_ultimate_att', '[]'); loadVault(); } }
 function recordAtt() {
     let n = prompt("الاسم:");
-    if(n) {
-        att.push({name: n, time: new Date().toLocaleString('ar-EG')});
-        localStorage.setItem('ms_att_v2', JSON.stringify(att));
-        alert("تم الحضور");
-    }
+    if(n) { att.push({name: n, time: new Date().toLocaleString('ar-EG')}); localStorage.setItem('ms_ultimate_att', JSON.stringify(att)); alert("تم"); }
 }
 function updateChairSum() {
     let today = new Date().toDateString();
-    let sum = db.filter(x => x.chair === currentChair && new Date(x.ts).toDateString() === today).reduce((a,b)=>a+b.amt, 0);
-    document.getElementById('chair-daily-sum').innerText = sum;
+    let sum = db.filter(x => x.chair === currentChair && new Date(x.ts).toDateString() === today).reduce((a,b)=>a+b.price, 0);
+    document.getElementById('chair-sum').innerText = sum;
 }
