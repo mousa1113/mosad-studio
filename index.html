@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mosad Studio | Management</title>
+    <title>Mosad Studio | Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
     <div class="background-glow"></div>
     
-    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal(false)"></div>
     <div id="custom-modal" class="custom-modal">
-        <h3 id="modal-title"></h3>
+        <h3 id="modal-title" style="color:var(--gold); margin-bottom:20px;"></h3>
         <input type="text" id="modal-input" placeholder="اكتب هنا...">
-        <div class="modal-buttons">
-            <button class="btn-glow" onclick="closeModal(true)">تأكيد</button>
-            <button class="btn-out" onclick="closeModal(false)">إلغاء</button>
+        <div style="display:flex; gap:10px; margin-top:20px;">
+            <button class="btn-glow" style="padding:10px" onclick="closeModal(true)">تأكيد</button>
+            <button class="btn-out" style="margin:0; color:white" onclick="closeModal(false)">إلغاء</button>
         </div>
     </div>
 
@@ -24,51 +24,43 @@
         <header>
             <h1 class="glitch">Mosad <span>Studio</span></h1>
             <div class="top-nav">
-                <button class="nav-btn" onclick="openAdminAuth()">🛡️ لوحة الإدارة</button>
-                <button class="nav-btn" onclick="openAttendance()">🕒 تسجيل حضور</button>
+                <button class="nav-btn" onclick="openAdminAuth()">🛡️ الإدارة</button>
+                <button class="nav-btn" onclick="openAttendance()">🕒 البصمة</button>
             </div>
         </header>
 
-        <div id="login-screen" class="section-box">
-            <h2 class="text-center">اختر الكرسي للبدء</h2>
+        <div id="login-screen" class="section-box fade-in">
+            <h2 class="text-center">اختر الكرسي</h2>
             <div id="barbers-grid" class="barbers-grid"></div>
         </div>
 
         <div id="work-screen" class="hidden section-box fade-in">
-            <div class="profile-header">
-                <h2 id="active-user"></h2>
-            </div>
+            <h2 id="active-user" class="gold-text"></h2>
             <div class="main-form">
-                <label>تسجيل إيراد</label>
-                <input type="text" id="cust-name" placeholder="اسم العميل (اختياري)">
+                <input type="text" id="cust-name" placeholder="اسم العميل">
                 <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
-                <button class="btn-glow" onclick="saveData()">تسجيل في الخزنة 💸</button>
+                <button class="btn-glow" onclick="saveData()">تسجيل العملية 💸</button>
             </div>
             <div class="mini-stats">
-                <p>إجمالي الكرسي اليوم:</p>
-                <div class="money-val"><span id="u-today">0</span> ج.م</div>
+                <p>إجمالي اليوم: <span id="u-today" class="money-val" style="font-size:1.5rem">0</span> ج</p>
             </div>
-            <button class="btn-out" onclick="showScreen('login-screen')">🔙 العودة</button>
+            <button class="btn-out" onclick="showScreen('login-screen')">🔙 رجوع</button>
         </div>
 
         <div id="admin-screen" class="hidden section-box fade-in">
-            <div class="admin-header">
-                <h2 class="gold-text">التقارير الذكية 📊</h2>
-                <button onclick="window.print()" class="nav-btn">🖨️ طباعة / PDF</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+                <h2 class="gold-text" style="margin:0">التقارير</h2>
+                <button onclick="window.print()" class="nav-btn" style="font-size:0.7rem">🖨️ طباعة</button>
             </div>
-            
-            <div class="admin-controls">
-                <button onclick="addNewChair()" class="btn-sm">➕ إضافة كرسي</button>
-                <button onclick="changeAdminPass()" class="btn-sm">🔑 الباسورد</button>
+            <div class="admin-controls" style="display:flex; gap:5px; margin-bottom:15px">
+                <button onclick="addNewChair()" class="btn-sm" style="flex:1">+ كرسي</button>
+                <button onclick="changeAdminPass()" class="btn-sm" style="flex:1">🔑 الباسورد</button>
             </div>
-
             <div class="report-grid" id="admin-stats"></div>
-            
             <div class="history-box">
-                <h3>شريط العمليات والبصمة</h3>
-                <div class="list-wrapper" id="log-body"></div>
+                <div id="log-body" class="list-wrapper"></div>
             </div>
-            <button class="btn-out" onclick="showScreen('login-screen')">إغلاق اللوحة</button>
+            <button class="btn-out" onclick="showScreen('login-screen')">إغلاق</button>
         </div>
     </div>
 
