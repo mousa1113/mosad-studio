@@ -1,41 +1,105 @@
-:root { --gold: #d4af37; --bg: #080808; --card: #121212; --text: #fff; }
-.light-theme { --bg: #dcdde1; --card: #f5f6fa; --text: #2f3640; }
+let db = JSON.parse(localStorage.getItem('mosad_final_db')) || [];
+let att = JSON.parse(localStorage.getItem('mosad_final_att')) || [];
+let chairs = JSON.parse(localStorage.getItem('mosad_final_chairs')) || ["الكرسي 1", "الكرسي 2"];
+let adminPass = localStorage.getItem('mosad_final_pass') || '5050';
 
-body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; margin: 0; transition: 0.3s; }
+window.onload = () => {
+    updateClock();
+    setInterval(updateClock, 1000);
+    renderChairs();
+    if(localStorage.getItem('theme') === 'light') toggleTheme(true);
+};
 
-/* الساعة في الأعلى */
-.top-clock { 
-    text-align: center; padding: 10px; font-size: 1.5rem; font-weight: 900; 
-    color: var(--gold); background: rgba(0,0,0,0.3); border-bottom: 1px solid var(--gold);
+// الساعة الرقمية بالثانية
+function updateClock() {
+    const now = new Date();
+    document.getElementById('digital-clock').innerText = now.toLocaleTimeString('ar-EG');
 }
 
-/* الخزنة الكاملة */
-.full-admin-screen {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: var(--bg); z-index: 2000; padding: 20px; box-sizing: border-box;
-    overflow-y: auto;
+// فتح الخزنة (إخفاء كل شيء آخر)
+function openAdmin() {
+    openModal("باسورد الخزنة", "🛡️", true, (v) => {
+        if(v === adminPass) {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('admin-panel').classList.remove('hidden');
+            renderAdminStats();
+        } else { alert("غلط!"); }
+    });
 }
 
-.admin-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-.stat-card { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid var(--gold); }
-.stat-card span { display: block; font-size: 0.8rem; color: gray; }
-.stat-card b { font-size: 1.4rem; color: var(--gold); }
-
-/* السجلات */
-.logs-section { display: grid; grid-template-columns: 1fr; gap: 15px; }
-.log-box { background: var(--card); border-radius: 15px; padding: 15px; }
-.log-head { display: flex; justify-content: space-between; color: var(--gold); font-weight: bold; margin-bottom: 10px; }
-.list-scroll { height: 200px; overflow-y: auto; font-size: 0.85rem; border-top: 1px solid #333; padding-top: 10px; }
-.log-item { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #222; }
-
-/* الأزرار الكريتيف */
-.btn-shiny-gold { 
-    width: 100%; padding: 15px; background: var(--gold); border: none; 
-    border-radius: 12px; font-weight: 900; cursor: pointer; box-shadow: 0 5px 15px rgba(212,175,55,0.3);
+function closeAdmin() {
+    document.getElementById('admin-panel').classList.add('hidden');
+    document.getElementById('main-app').classList.remove('hidden');
 }
-.btn-close-admin { background: #ff4d4d; color: white; border: none; padding: 10px 15px; border-radius: 10px; cursor: pointer; }
 
-.hidden { display: none; }
-.fade-in { animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+// تسجيل العمليات بالساعة والدقيقة
+function saveData() {
+    const a = document.getElementById('amount').value;
+    if(!a) return;
+    db.push({ 
+        chair: currentUser, 
+        price: parseFloat(a), 
+        time: new Date().getTime(),
+        timeStr: new Date().toLocaleTimeString('ar-EG') 
+    });
+    localStorage.setItem('mosad_final_db', JSON.stringify(db));
+    document.getElementById('amount').value = "";
+    updateUserTotal();
+    alert("تم الحفظ بالساعة: " + new Date().toLocaleTimeString('ar-EG'));
+}
+
+function renderAdminStats() {
+    const now = new Date().getTime();
+    const d = 86400000;
+    const calc = (days) => db.filter(r => (now - r.time) < (days * d)).reduce((a, b) => a + b.price, 0);
+
+    document.getElementById('s-day').innerText = calc(1) + "ج";
+    document.getElementById('s-week').innerText = calc(7) + "ج";
+    document.getElementById('s-month').innerText = calc(30) + "ج";
+    document.getElementById('s-year').innerText = calc(365) + "ج";
+
+    document.getElementById('money-log').innerHTML = db.slice(-20).reverse().map(l => `
+        <div class="log-item"><span>${l.chair}: ${l.price}ج</span> <small>${l.timeStr}</small></div>
+    `).join('');
+
+    document.getElementById('att-log').innerHTML = att.slice(-20).reverse().map(l => `
+        <div class="log-item"><span>${l.name}</span> <small>${l.timeStr}</small></div>
+    `).join('');
+}
+
+// نظام المودال
+let modalCb = null;
+function openModal(title, icon, isPass, cb) {
+    document.getElementById('modal-title').innerText = title;
+    const inp = document.getElementById('modal-input');
+    inp.type = isPass ? "password" : "text"; inp.value = "";
+    document.getElementById('modal-overlay').style.display = 'block';
+    document.getElementById('custom-modal').classList.add('active');
+    modalCb = cb;
+}
+
+function closeModal(confirm) {
+    const v = document.getElementById('modal-input').value;
+    document.getElementById('custom-modal').classList.remove('active');
+    document.getElementById('modal-overlay').style.display = 'none';
+    if(confirm && modalCb) modalCb(v);
+}
+
+// تصفير السجلات
+function resetLogs(type) {
+    if(confirm("تمسح السجل ده نهائياً؟")) {
+        if(type === 'money') db = []; else att = [];
+        localStorage.setItem('mosad_final_' + (type==='money'?'db':'att'), JSON.stringify([]));
+        renderAdminStats();
+    }
+}
+
+// وظائف مساعدة
+function toggleTheme(init=false) {
+    if(!init) document.body.classList.toggle('light-theme');
+    localStorage.setItem('theme', document.body.classList.contains('light-theme')?'light':'dark');
+}
+function renderChairs() { document.getElementById('barbers-grid').innerHTML = chairs.map(c => `<div class="barber-item" style="background:var(--card); padding:20px; border-radius:15px; border:1px solid var(--gold); cursor:pointer; text-align:center" onclick="selectChair('${c}')">💺<br>${c}</div>`).join(''); }
+function selectChair(c) { currentUser = c; document.getElementById('login-screen').classList.add('hidden'); document.getElementById('work-screen').classList.remove('hidden'); document.getElementById('active-user').innerText = c; updateUserTotal(); }
+function showScreen(id) { document.getElementById('work-screen').classList.add('hidden'); document.getElementById('login-screen').classList.remove('hidden'); }
+function updateUserTotal() { let today = new Date().toDateString(); let s = db.filter(r => r.chair === currentUser && new Date(r.time).toDateString() === today).reduce((a, b) => a + b.price, 0); document.getElementById('u-today').innerText = s; }
