@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mosad Studio | Pro Management</title>
+    <title>Mosad Studio | Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -12,8 +12,8 @@
     
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(false)"></div>
     <div id="custom-modal" class="custom-modal">
-        <h3 id="modal-title" style="color:var(--gold)"></h3>
-        <input type="text" id="modal-input" placeholder="اكتب هنا...">
+        <h3 id="modal-title" style="color:var(--gold); margin-bottom:15px;"></h3>
+        <input type="text" id="modal-input" placeholder="اكتب هنا..." class="creative-input">
         <div style="display:flex; gap:10px; margin-top:20px;">
             <button class="btn-glow" onclick="closeModal(true)">تأكيد</button>
             <button class="btn-out" style="margin:0" onclick="closeModal(false)">إلغاء</button>
@@ -37,28 +37,27 @@
         <div id="work-screen" class="hidden section-box">
             <h2 id="active-user" class="gold-text"></h2>
             <div class="main-form">
-                <input type="text" id="cust-name" placeholder="اسم العميل">
-                <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
+                <input type="text" id="cust-name" class="creative-input" placeholder="اسم العميل">
+                <input type="number" id="amount" class="creative-input" placeholder="المبلغ" inputmode="numeric">
                 <button class="btn-glow" onclick="saveData()">تسجيل العملية 💸</button>
             </div>
             <div class="mini-stats">
-                <p>إجمالي اليوم: <span id="u-today" class="money-val">0</span> ج</p>
+                <p>إجمالي اليوم للكرسي: <span id="u-today" class="money-val">0</span> ج</p>
             </div>
             <button class="btn-out" onclick="showScreen('login-screen')">🔙 رجوع</button>
         </div>
 
-        <div id="admin-screen" class="hidden section-box fade-in">
+        <div id="admin-screen" class="hidden section-box">
             <div class="admin-header">
-                <h2 class="gold-text">لوحة التحكم</h2>
-                <button onclick="window.print()" class="nav-btn">🖨️ طباعة الكل</button>
+                <h2 class="gold-text">الإدارة والتقارير</h2>
+                <div class="admin-controls">
+                    <button onclick="addNewChair()" class="btn-sm">+ كرسي جديد</button>
+                    <button onclick="changeAdminPass()" class="btn-sm">🔑 كلمة السر</button>
+                    <button onclick="resetAllData()" class="btn-sm" style="border-color:#ff4d4d; color:#ff4d4d;">🗑️ تصفير الحسابات</button>
+                </div>
             </div>
 
-            <div class="admin-controls">
-                <button onclick="addNewChair()" class="btn-sm">+ كرسي</button>
-                <button onclick="changeAdminPass()" class="btn-sm">🔑 الباسورد</button>
-            </div>
-
-            <div class="report-grid" id="admin-stats"></div>
+            <div class="main-reports-grid" id="main-reports"></div>
 
             <hr style="border: 0.5px solid #333; margin: 20px 0;">
 
@@ -74,8 +73,7 @@
                     <div id="att-log" class="list-wrapper"></div>
                 </div>
             </div>
-            
-            <button class="btn-out" onclick="showScreen('login-screen')">إغلاق</button>
+            <button class="btn-out" style="width:100%" onclick="showScreen('login-screen')">إغلاق</button>
         </div>
     </div>
     <script src="script.js"></script>
