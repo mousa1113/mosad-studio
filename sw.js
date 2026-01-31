@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mosad-studio-v1';
+const CACHE_NAME = 'mosad-studio-v2';
 const ASSETS = [
   '/',
   '/index.html',
@@ -7,20 +7,14 @@ const ASSETS = [
   '/logo.png'
 ];
 
-// تثبيت الـ Service Worker وحفظ الملفات في الكاش
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
-    })
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-// استرجاع الملفات من الكاش عند انقطاع الإنترنت
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request);
-    })
+    caches.match(event.request).then((response) => response || fetch(event.request))
   );
 });
