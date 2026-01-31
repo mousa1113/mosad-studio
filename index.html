@@ -3,85 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSAD STUDIO | Creative Pro</title>
+    <title>Management System | Mosad Studio</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="app-wrapper">
-        <header class="main-header">
-            <div class="logo">MOSAD <span>STUDIO</span></div>
-            <div id="clock" class="clock">00:00:00</div>
-        </header>
+<body class="studio-theme">
+    <div class="main-overlay"></div>
+    
+    <header class="studio-header">
+        <div class="brand">MOSAD <span>STUDIO</span></div>
+        <div id="clock" class="digital-clock">00:00:00</div>
+    </header>
 
-        <section id="view-home" class="view active">
-            <div class="grid-layout" id="chairs-grid"></div>
-            <div class="bottom-nav">
-                <button class="nav-btn" onclick="openModal('att-modal')">🕒 بصمة</button>
-                <button class="nav-btn gold" onclick="openModal('auth-modal')">🛡️ الخزنة</button>
+    <main class="app-body">
+        <section id="chairs-screen" class="screen active">
+            <div class="grid-container" id="chairs-render"></div>
+            <div class="bottom-dock">
+                <button class="dock-item att" onclick="openModal('attendance-modal')">
+                    <span class="icon">🕒</span> الحضور
+                </button>
+                <button class="dock-item vault" onclick="openModal('admin-auth-modal')">
+                    <span class="icon">🛡️</span> الإدارة
+                </button>
             </div>
         </section>
 
-        <section id="view-chair-work" class="view">
-            <div class="work-card">
-                <h2 id="chair-title">الكرسي 1</h2>
-                <div class="creative-inputs">
-                    <input type="text" id="c-name" placeholder="اسم العميل">
-                    <input type="number" id="c-amt" placeholder="المبلغ" inputmode="numeric">
+        <section id="work-screen" class="screen">
+            <div class="work-glass-card">
+                <h2 id="chair-label">الكرسي 1</h2>
+                <div class="form-creative">
+                    <div class="input-unit">
+                        <input type="text" id="cust-name" placeholder=" " required>
+                        <label>اسم العميل / الرقم</label>
+                    </div>
+                    <div class="input-unit">
+                        <input type="number" id="cust-price" placeholder=" " required inputmode="numeric">
+                        <label>المبلغ (ج.م)</label>
+                    </div>
                 </div>
-                <button class="confirm-btn" onclick="saveData()">تأكيد 💸</button>
-                <div class="daily-badge">إيراد اليوم: <span id="c-sum">0</span></div>
-                <button class="back-link" onclick="showView('view-home')">🔙 العودة</button>
+                <button class="btn-submit-pro" onclick="processSale()">تأكيد العملية ⚡</button>
+                <div class="chair-stat">إجمالي اليوم: <span id="chair-day-total">0</span></div>
+                <button class="btn-return" onclick="showScreen('chairs-screen')">رجوع</button>
             </div>
         </section>
+    </main>
+
+    <div class="modal-layer" id="attendance-modal">
+        <div class="modal-card">
+            <h3>تسجيل حضور</h3>
+            <input type="text" id="staff-user" placeholder="اسم الموظف">
+            <button class="btn-modal-act" onclick="confirmAtt()">تسجيل الآن</button>
+            <button class="btn-modal-close" onclick="closeModal('attendance-modal')">إلغاء</button>
+        </div>
     </div>
 
-    <div id="auth-modal" class="modal">
-        <div class="modal-content">
+    <div class="modal-layer" id="admin-auth-modal">
+        <div class="modal-card">
             <h3>دخول الإدارة</h3>
-            <input type="password" id="admin-pass" placeholder="••••">
-            <button onclick="checkAdmin()">دخول</button>
-            <button class="close-txt" onclick="closeModal('auth-modal')">إلغاء</button>
+            <input type="password" id="admin-key" placeholder="كلمة المرور">
+            <button class="btn-modal-act" onclick="authAdmin()">دخول</button>
+            <button class="btn-modal-close" onclick="closeModal('admin-auth-modal')">إلغاء</button>
         </div>
     </div>
 
-    <div id="att-modal" class="modal">
-        <div class="modal-content">
-            <h3>تسجيل الحضور</h3>
-            <input type="text" id="staff-name" placeholder="اسم الموظف">
-            <button onclick="confirmAtt()">بصمة ✅</button>
-            <button class="close-txt" onclick="closeModal('att-modal')">إلغاء</button>
-        </div>
-    </div>
-
-    <div id="vault-panel" class="vault-panel">
-        <div class="vault-header">
-            <h2>الخزنة</h2>
-            <button class="exit-x" onclick="closeVault()">×</button>
-        </div>
-        
-        <div class="stats-row" id="stats-container">
-            <div class="s-circle"><span>يومي</span><b id="d-val">0</b></div>
-            <div class="s-circle"><span>أسبوعي</span><b id="w-val">0</b></div>
-            <div class="s-circle"><span>شهري</span><b id="m-val">0</b></div>
-            <div class="s-circle gold"><span>سنوي</span><b id="y-val">0</b></div>
+    <div id="admin-dashboard" class="dashboard-overlay">
+        <div class="dash-head">
+            <h2>إدارة المحل</h2>
+            <button class="dash-exit" onclick="closeDashboard()">×</button>
         </div>
 
-        <div class="logs-container">
-            <div class="log-tile">
-                <h4>💰 المبيعات <button onclick="clearLog('money')">🗑️</button></h4>
-                <div id="money-list" class="scroll-v"></div>
+        <div class="chair-selector-tabs" id="dash-tabs"></div>
+
+        <div class="stats-box-grid">
+            <div class="stat-bubble" onclick="printData('day')"><span>يومي</span><b id="d-total">0</b></div>
+            <div class="stat-bubble" onclick="printData('week')"><span>أسبوعي</span><b id="w-total">0</b></div>
+            <div class="stat-bubble" onclick="printData('month')"><span>شهري</span><b id="m-total">0</b></div>
+            <div class="stat-bubble gold" onclick="printData('year')"><span>سنوي</span><b id="y-total">0</b></div>
+        </div>
+
+        <div class="data-logs">
+            <div class="log-section">
+                <div class="log-h">💰 سجل المبيعات <button onclick="resetData('money')">مسح</button></div>
+                <div id="sales-log" class="v-scroll"></div>
             </div>
-            <div class="log-tile">
-                <h4>🕒 الحضور <button onclick="clearLog('att')">🗑️</button></h4>
-                <div id="att-list" class="scroll-v"></div>
+            <div class="log-section">
+                <div class="log-h">🕒 سجل الحضور <button onclick="resetData('att')">مسح</button></div>
+                <div id="att-log" class="v-scroll"></div>
             </div>
         </div>
 
-        <div class="vault-footer">
-            <button class="f-btn" onclick="addChair()">➕ إضافة</button>
-            <button class="f-btn red" onclick="delChair()">➖ حذف</button>
-            <button class="f-btn print" onclick="window.print()">🖨️ طباعة</button>
+        <div class="dash-footer">
+            <button class="footer-btn add" onclick="addChair()">➕ إضافة</button>
+            <button class="footer-btn del" onclick="delChair()">➖ حذف</button>
+            <button class="footer-btn print" onclick="window.print()">🖨️ طباعة</button>
         </div>
     </div>
 
