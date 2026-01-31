@@ -1,40 +1,30 @@
-/* الألوان والأساسيات */
 :root { --gold: #d4af37; --dark: #0a0a0a; --glass: rgba(255,255,255,0.05); }
 body { background: var(--dark); color: #fff; font-family: 'Cairo', sans-serif; margin:0; }
 .app-container { padding: 20px; max-width: 600px; margin: auto; }
 
-/* التصميم الكريتيف */
 .section-box { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); margin-top: 20px; }
 .barbers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.barber-item { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
-.barber-item:hover { transform: scale(1.05); border-color: var(--gold); }
+.barber-item { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 15px; border-radius: 20px; text-align: center; cursor: pointer; }
 
-/* تقارير الكراسي */
+.creative-input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 12px; border: 1px solid #444; background: #000; color: #fff; font-family: 'Cairo'; box-sizing: border-box; }
+
+.main-reports-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+.total-card { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 15px; border-radius: 15px; text-align: center; }
+.total-card h4 { margin: 0; font-size: 0.8rem; color: #888; }
+.total-card .val { font-size: 1.1rem; font-weight: bold; color: var(--gold); display: block; margin: 5px 0; }
+.btn-print-sm { background: var(--gold); border: none; font-size: 0.7rem; padding: 3px 10px; border-radius: 5px; cursor: pointer; font-weight: bold; color: #000; }
+
 .chair-detail-card { background: rgba(0,0,0,0.3); border: 1px solid #222; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
-.chair-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; text-align: center; margin: 10px 0; }
-.chair-stats-row span { color: var(--gold); font-weight: bold; font-size: 0.9rem; }
-.chair-stats-row small { font-size: 0.6rem; color: #888; }
+.log-entry { font-size: 0.75rem; border-bottom: 1px solid #222; padding: 5px 0; color: #ccc; }
+.log-entry span { color: var(--gold); }
 
-/* سجلات منفصلة */
-.dual-logs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-.log-section h3 { font-size: 0.9rem; color: var(--gold); }
-.list-wrapper { background: #000; height: 150px; overflow-y: auto; border-radius: 10px; padding: 10px; font-size: 0.7rem; }
-.log-entry { border-bottom: 1px solid #222; padding: 5px 0; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; z-index: 100; }
+.custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid var(--gold); border-radius: 20px; padding: 25px; width: 80%; max-width: 350px; display: none; z-index: 101; text-align: center; }
 
-/* أزرار وحذف */
-.btn-del { background: none; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 5px; font-size: 0.6rem; padding: 2px 5px; cursor: pointer; }
-.print-mini { width: 100%; background: #222; border: 1px solid var(--gold); color: white; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 0.8rem; padding: 5px; }
+.btn-glow { background: var(--gold); color: #000; border: none; padding: 12px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; }
+.nav-btn { background: #222; border: 1px solid #444; color: white; padding: 8px 15px; border-radius: 10px; cursor: pointer; font-size: 0.8rem; }
+.btn-sm { background: #111; border: 1px solid var(--gold); color: #fff; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 0.7rem; }
+.btn-out { background: none; border: 1px solid #444; color: #888; padding: 8px; border-radius: 10px; cursor: pointer; margin-top: 10px; }
+.list-wrapper { background: #000; height: 150px; overflow-y: auto; border-radius: 10px; padding: 10px; border: 1px solid #222; }
 .hidden { display: none; }
-.gold-text { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
-
-/* Modals */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; }
-.custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid var(--gold); padding: 25px; border-radius: 20px; z-index: 101; display: none; width: 85%; max-width: 350px; text-align: center; }
-.custom-modal.active { display: block; }
-
-/* الطباعة */
-@media print {
-    .nav-btn, .admin-controls, .btn-out, .btn-del, .print-mini { display: none !important; }
-    body { background: white; color: black; }
-    .section-box { border: none; box-shadow: none; }
-}
+.gold-text { color: var(--gold); text-align: center; }
