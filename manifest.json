@@ -1,10 +1,24 @@
 {
-  "name": "خزنة ملوك الشياكة",
-  "short_name": "الخزنة",
-  "start_url": "index.html",
+  "name": "Mosad Studio Pro",
+  "short_name": "Mosad Studio",
+  "description": "نظام الإدارة المالية المتطور لستوديو مسعد",
+  "start_url": "/",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#d4af37",
-  "icons": [{ "src": "مسعد.jpg", "sizes": "512x512", "type": "image/jpeg" }]
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
 
