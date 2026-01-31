@@ -3,84 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mosad Studio | Premium System</title>
+    <title>Mosad Studio | Premium</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body class="dark-theme"> <div class="background-glow"></div>
+<body class="dark-theme">
+    <div class="background-glow"></div>
     
-    <div id="modal-overlay" class="modal-overlay" onclick="closeModal(false)"></div>
-    <div id="custom-modal" class="custom-modal">
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="custom-modal" class="creative-card-modal">
+        <div class="modal-icon" id="modal-icon">👑</div>
         <h3 id="modal-title"></h3>
-        <input type="text" id="modal-input">
-        <div class="modal-btns">
-            <button class="btn-confirm" onclick="closeModal(true)">تأكيد</button>
-            <button class="btn-cancel" onclick="closeModal(false)">إلغاء</button>
+        <div class="input-wrapper">
+            <input type="text" id="modal-input" placeholder=" ">
+            <label>اكتب هنا...</label>
+        </div>
+        <div class="modal-actions">
+            <button class="btn-confirm-shiny" onclick="closeModal(true)">تأكيد الدخول</button>
+            <button class="btn-cancel-flat" onclick="closeModal(false)">إلغاء</button>
         </div>
     </div>
 
     <div class="app-container">
-        <header>
-            <div class="header-top">
-                <h1 class="logo">Mosad <span>Studio</span></h1>
-                <button id="theme-toggle" onclick="toggleTheme()">🌓</button>
+        <header class="main-header">
+            <div class="logo-area">
+                <h1 class="glitch">Mosad <span>Studio</span></h1>
+                <button id="theme-btn" class="theme-switcher" onclick="toggleTheme()">
+                    <span class="icon">🌙</span>
+                </button>
             </div>
-            <div class="main-nav">
-                <button class="nav-card" onclick="openAdminAuth()">🛡️ الإدارة</button>
-                <button class="nav-card" onclick="openAttendance()">🕒 البصمة</button>
-            </div>
+            <nav class="quick-nav">
+                <div class="nav-item admin" onclick="openAdminAuth()">
+                    <span class="icon">🛡️</span>
+                    <span class="label">لوحة الإدارة</span>
+                </div>
+                <div class="nav-item attendance" onclick="openAttendance()">
+                    <span class="icon">🕒</span>
+                    <span class="label">بصمة الحضور</span>
+                </div>
+            </nav>
         </header>
 
-        <main id="login-screen" class="module-card">
-            <div class="module-header">📊 محطة العمل</div>
-            <div id="barbers-grid" class="barbers-grid"></div>
-        </main>
+        <section id="login-screen" class="module-bundle">
+            <div class="bundle-header">💎 اختر الكرسي لبدء الوردية</div>
+            <div id="barbers-grid" class="chairs-grid"></div>
+        </section>
 
-        <div id="work-screen" class="hidden module-card fade-in">
-            <h2 id="active-user" class="active-title"></h2>
-            <div class="input-group">
-                <input type="text" id="cust-name" placeholder="اسم العميل">
-                <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
-                <button class="btn-action pulse" onclick="saveData()">إضافة للخزنة 💰</button>
-            </div>
-            <div class="status-bar">إجمالي اليوم: <span id="u-today">0</span> ج.م</div>
-            <button class="btn-secondary" onclick="showScreen('login-screen')">🔙 العودة</button>
-        </div>
-
-        <div id="admin-screen" class="hidden module-card fade-in">
-            <div class="module-header">🛡️ لوحة التحكم المركزية</div>
-            
-            <div class="admin-quick-actions">
-                <button class="action-chip" onclick="addNewChair()">+ إضافة كرسي</button>
-                <button class="action-chip" onclick="changeAdminPass()">🔑 كلمة السر</button>
-            </div>
-
-            <div class="filter-box">
-                <h4>🖨️ طباعة تقرير مخصص</h4>
-                <div class="date-inputs">
-                    <input type="date" id="date-from" title="من تاريخ">
-                    <input type="date" id="date-to" title="إلى تاريخ">
+        <section id="work-screen" class="hidden module-bundle fade-in">
+            <h2 id="active-user" class="active-tag"></h2>
+            <div class="glass-form">
+                <div class="input-group">
+                    <input type="text" id="cust-name" placeholder="اسم العميل">
+                    <input type="number" id="amount" placeholder="المبلغ ج.م" inputmode="numeric">
                 </div>
-                <button class="btn-print-custom" onclick="printCustomRange()">طباعة الفترة المحددة</button>
+                <button class="btn-main-action" onclick="saveData()">تسجيل العملية 💰</button>
+            </div>
+            <div class="live-counter">
+                إجمالي الكرسي اليوم: <span id="u-today">0</span> ج.م
+            </div>
+            <button class="btn-back" onclick="showScreen('login-screen')">🔙 العودة للرئيسية</button>
+        </section>
+
+        <section id="admin-screen" class="hidden module-bundle fade-in">
+            <div class="admin-top">
+                <h2 class="gold-text">التقارير المركزية</h2>
+                <button class="btn-print-all" onclick="window.print()">🖨️ طباعة الكل</button>
             </div>
 
-            <div class="stats-overview" id="admin-stats"></div>
+            <div class="filter-panel">
+                <h4>🖨️ تقرير فترة مخصصة</h4>
+                <div class="date-row">
+                    <input type="date" id="date-from">
+                    <input type="date" id="date-to">
+                </div>
+                <button class="btn-action-light" onclick="printCustomRange()">عرض وطباعة الفترة</button>
+            </div>
 
+            <div class="quick-stats-row" id="admin-stats"></div>
             <div id="chairs-detail-list"></div>
 
-            <div class="logs-container">
-                <div class="log-box">
+            <div class="dual-logs">
+                <div class="log-bundle">
                     <h4>💰 الإيرادات</h4>
-                    <div id="money-log"></div>
+                    <div id="money-log" class="scroll-log"></div>
                 </div>
-                <div class="log-box">
+                <div class="log-bundle">
                     <h4>🕒 الحضور</h4>
-                    <div id="att-log"></div>
+                    <div id="att-log" class="scroll-log"></div>
                 </div>
             </div>
 
-            <button class="btn-secondary" onclick="showScreen('login-screen')">إغلاق</button>
-        </div>
+            <div class="admin-footer-btns">
+                <button class="btn-add" onclick="addNewChair()">+ إضافة كرسي</button>
+                <button class="btn-pass" onclick="changeAdminPass()">🔑 كلمة السر</button>
+            </div>
+            <button class="btn-back" onclick="showScreen('login-screen')">خروج</button>
+        </section>
     </div>
     <script src="script.js"></script>
 </body>
