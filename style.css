@@ -1,79 +1,40 @@
-:root { --gold: #d4af37; --dark: #0a0a0a; --glass: rgba(255, 255, 255, 0.05); }
-body { background: var(--dark); color: #fff; font-family: 'Cairo', sans-serif; margin: 0; overflow-x: hidden; }
+/* الألوان والأساسيات */
+:root { --gold: #d4af37; --dark: #0a0a0a; --glass: rgba(255,255,255,0.05); }
+body { background: var(--dark); color: #fff; font-family: 'Cairo', sans-serif; margin:0; }
+.app-container { padding: 20px; max-width: 600px; margin: auto; }
 
-.background-glow {
-    position: fixed; top: -10%; left: -10%; width: 120%; height: 120%;
-    background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%);
-    z-index: -1;
-}
+/* التصميم الكريتيف */
+.section-box { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); margin-top: 20px; }
+.barbers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+.barber-item { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
+.barber-item:hover { transform: scale(1.05); border-color: var(--gold); }
 
-.app-container { padding: 20px; max-width: 500px; margin: auto; }
-header { text-align: center; margin-bottom: 30px; }
-.glitch { font-size: 2.8rem; font-weight: 900; margin: 0; }
-.glitch span { color: var(--gold); text-shadow: 0 0 15px var(--gold); }
+/* تقارير الكراسي */
+.chair-detail-card { background: rgba(0,0,0,0.3); border: 1px solid #222; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
+.chair-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; text-align: center; margin: 10px 0; }
+.chair-stats-row span { color: var(--gold); font-weight: bold; font-size: 0.9rem; }
+.chair-stats-row small { font-size: 0.6rem; color: #888; }
 
-.top-nav { display: flex; gap: 10px; justify-content: center; margin-top: 15px; }
-.nav-btn { 
-    background: var(--glass); border: 1px solid var(--gold); color: white; 
-    padding: 10px 15px; border-radius: 12px; cursor: pointer; font-weight: bold;
-    transition: 0.3s;
-}
-.nav-btn:hover { background: var(--gold); color: black; transform: translateY(-3px); }
+/* سجلات منفصلة */
+.dual-logs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.log-section h3 { font-size: 0.9rem; color: var(--gold); }
+.list-wrapper { background: #000; height: 150px; overflow-y: auto; border-radius: 10px; padding: 10px; font-size: 0.7rem; }
+.log-entry { border-bottom: 1px solid #222; padding: 5px 0; }
 
-.section-box {
-    background: var(--glass); backdrop-filter: blur(15px);
-    border: 1px solid rgba(255,255,255,0.1); padding: 25px;
-    border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);
-}
-
-.barbers-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 20px; }
-.barber-item { 
-    background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 20px;
-    border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s;
-}
-.barber-item:hover { border-color: var(--gold); transform: scale(1.05); background: rgba(212,175,55,0.05); }
-.barber-item h3 { margin: 10px 0 0; font-size: 1.2rem; }
-
-input {
-    width: 100%; padding: 15px; background: #000; border: 1px solid #333;
-    border-radius: 12px; color: #fff; margin-bottom: 15px; text-align: center; font-size: 1.1rem;
-    box-sizing: border-box;
-}
-input:focus { border-color: var(--gold); outline: none; }
-
-.btn-glow {
-    width: 100%; padding: 18px; background: linear-gradient(45deg, #d4af37, #f1c40f);
-    border: none; border-radius: 15px; font-weight: 900; cursor: pointer; transition: 0.3s;
-}
-.btn-glow:hover { box-shadow: 0 0 20px rgba(212,175,55,0.4); transform: scale(1.02); }
-
-.money-val { font-size: 2.5rem; color: #2ecc71; font-weight: 900; }
-
-/* Admin Grid */
-.report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-.report-card { background: rgba(0,0,0,0.4); padding: 15px; border-radius: 15px; text-align: center; border: 1px solid #222; }
-.report-card h3 { font-size: 0.8rem; margin: 0; color: #888; }
-.report-card span { font-size: 1.2rem; font-weight: 900; display: block; color: var(--gold); }
-.gold-border { border: 1px solid var(--gold) !important; }
-
-/* Custom Modal */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; }
-.custom-modal { 
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); 
-    background: #111; border: 2px solid var(--gold); padding: 30px; border-radius: 25px; 
-    z-index: 101; display: none; width: 80%; max-width: 350px; text-align: center;
-}
-.custom-modal.active { display: block; animation: modalIn 0.3s ease; }
-
-@keyframes modalIn { from { opacity: 0; transform: translate(-50%, -60%); } to { opacity: 1; transform: translate(-50%, -50%); } }
-
+/* أزرار وحذف */
+.btn-del { background: none; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 5px; font-size: 0.6rem; padding: 2px 5px; cursor: pointer; }
+.print-mini { width: 100%; background: #222; border: 1px solid var(--gold); color: white; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 0.8rem; padding: 5px; }
 .hidden { display: none; }
-.fade-in { animation: fadeIn 0.5s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.gold-text { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
 
+/* Modals */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; }
+.custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid var(--gold); padding: 25px; border-radius: 20px; z-index: 101; display: none; width: 85%; max-width: 350px; text-align: center; }
+.custom-modal.active { display: block; }
+
+/* الطباعة */
 @media print {
-    body * { visibility: hidden; }
-    #admin-screen, #admin-screen * { visibility: visible; }
-    #admin-screen { position: absolute; left: 0; top: 0; width: 100%; background: white; color: black; }
-    .btn-out, .admin-controls, .nav-btn { display: none; }
+    .nav-btn, .admin-controls, .btn-out, .btn-del, .print-mini { display: none !important; }
+    body { background: white; color: black; }
+    .section-box { border: none; box-shadow: none; }
 }
