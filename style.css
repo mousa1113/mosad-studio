@@ -1,40 +1,70 @@
-/* الألوان والأساسيات */
-:root { --gold: #d4af37; --dark: #0a0a0a; --glass: rgba(255,255,255,0.05); }
-body { background: var(--dark); color: #fff; font-family: 'Cairo', sans-serif; margin:0; }
-.app-container { padding: 20px; max-width: 600px; margin: auto; }
+:root {
+    --primary: #d4af37;
+    --bg: #0f0f0f;
+    --card: #1a1a1a;
+    --text: #ffffff;
+    --border: rgba(212, 175, 55, 0.2);
+}
 
-/* التصميم الكريتيف */
-.section-box { background: var(--glass); backdrop-filter: blur(15px); border-radius: 25px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); margin-top: 20px; }
+.light-theme {
+    --bg: #f0f2f5;
+    --card: #ffffff;
+    --text: #1a1a1a;
+    --border: #ddd;
+}
+
+body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; transition: 0.3s; margin: 0; }
+.app-container { max-width: 600px; margin: auto; padding: 15px; }
+
+/* الهيدر واللوجو */
+.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.logo { font-weight: 900; font-size: 1.8rem; margin: 0; }
+.logo span { color: var(--primary); }
+#theme-toggle { background: var(--card); border: 1px solid var(--border); border-radius: 50%; padding: 10px; cursor: pointer; font-size: 1.2rem; }
+
+/* نظام الحزم (Modules) */
+.module-card {
+    background: var(--card); border-radius: 20px; padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border);
+    margin-bottom: 20px;
+}
+.module-header { font-weight: 900; color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+
+/* الزراير الحية */
+.nav-card {
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    padding: 15px; border-radius: 15px; color: var(--text); font-weight: bold;
+    cursor: pointer; transition: 0.3s;
+}
+.nav-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(212,175,55,0.2); }
+
 .barbers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.barber-item { background: rgba(255,255,255,0.03); border: 1px solid #333; padding: 15px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s; }
-.barber-item:hover { transform: scale(1.05); border-color: var(--gold); }
+.barber-item { 
+    background: var(--bg); border: 1px solid var(--border); padding: 20px; 
+    border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s;
+}
+.barber-item:hover { background: var(--primary); color: #000; }
 
-/* تقارير الكراسي */
-.chair-detail-card { background: rgba(0,0,0,0.3); border: 1px solid #222; padding: 15px; border-radius: 15px; margin-bottom: 15px; }
-.chair-stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; text-align: center; margin: 10px 0; }
-.chair-stats-row span { color: var(--gold); font-weight: bold; font-size: 0.9rem; }
-.chair-stats-row small { font-size: 0.6rem; color: #888; }
+/* الفلترة والطباعة */
+.filter-box { background: rgba(212, 175, 55, 0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
+.date-inputs { display: flex; gap: 10px; margin-bottom: 10px; }
+.date-inputs input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
+.btn-print-custom { width: 100%; padding: 10px; background: var(--primary); border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
 
-/* سجلات منفصلة */
-.dual-logs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-.log-section h3 { font-size: 0.9rem; color: var(--gold); }
-.list-wrapper { background: #000; height: 150px; overflow-y: auto; border-radius: 10px; padding: 10px; font-size: 0.7rem; }
-.log-entry { border-bottom: 1px solid #222; padding: 5px 0; }
+/* السجلات */
+.logs-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
+.log-box { font-size: 0.75rem; background: var(--bg); padding: 10px; border-radius: 10px; height: 150px; overflow-y: auto; }
 
-/* أزرار وحذف */
-.btn-del { background: none; border: 1px solid #ff4d4d; color: #ff4d4d; border-radius: 5px; font-size: 0.6rem; padding: 2px 5px; cursor: pointer; }
-.print-mini { width: 100%; background: #222; border: 1px solid var(--gold); color: white; border-radius: 10px; margin-top: 10px; cursor: pointer; font-size: 0.8rem; padding: 5px; }
+/* الحذف والطباعة المصغرة */
+.chair-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 10px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--primary); }
+.btn-del { color: #ff4d4d; background: none; border: none; cursor: pointer; }
+
 .hidden { display: none; }
-.gold-text { color: var(--gold); text-shadow: 0 0 10px var(--gold); }
+.fade-in { animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* Modals */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: none; }
-.custom-modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #111; border: 2px solid var(--gold); padding: 25px; border-radius: 20px; z-index: 101; display: none; width: 85%; max-width: 350px; text-align: center; }
-.custom-modal.active { display: block; }
-
-/* الطباعة */
 @media print {
-    .nav-btn, .admin-controls, .btn-out, .btn-del, .print-mini { display: none !important; }
-    body { background: white; color: black; }
-    .section-box { border: none; box-shadow: none; }
+    body { background: white !important; color: black !important; }
+    .nav-card, #theme-toggle, .admin-quick-actions, .filter-box, .btn-secondary, .btn-del { display: none !important; }
+    .module-card { border: 1px solid #000; box-shadow: none; margin: 0; padding: 10px; }
 }
