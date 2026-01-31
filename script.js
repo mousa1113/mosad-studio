@@ -1,133 +1,107 @@
-let db = JSON.parse(localStorage.getItem('mosad_v3_db')) || [];
-let att = JSON.parse(localStorage.getItem('mosad_v3_att')) || [];
-let chairs = JSON.parse(localStorage.getItem('mosad_v3_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
-let adminPass = localStorage.getItem('mosad_v3_pass') || '5050';
-let currentUser = "";
+let db = JSON.parse(localStorage.getItem('mosad_mega_safe')) || [];
+let att = JSON.parse(localStorage.getItem('mosad_attendance')) || [];
+let chairs = JSON.parse(localStorage.getItem('mosad_chairs')) || [
+    {name: 'مسعد', img: 'mosad.jpg', pass: '7007'},
+    {name: 'محمد', img: 'mohamed.jpg', pass: '1397'},
+    {name: 'محمود', img: 'mahmoud.jpg', pass: '1593'}
+];
+let user = "";
 
 window.onload = () => {
-    setInterval(() => {
-        document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('ar-EG');
-    }, 1000);
     renderChairs();
+    setInterval(updateClock, 1000);
     if(localStorage.getItem('theme') === 'light') toggleTheme(true);
 };
 
-// نظام المودال للطلبات
-let modalCallback = null;
-function openModal(title, isPass, cb) {
-    document.getElementById('modal-title').innerText = title;
-    const inp = document.getElementById('modal-input');
-    inp.type = isPass ? "password" : "text"; inp.value = "";
-    document.getElementById('modal-overlay').style.display = 'block';
-    document.getElementById('custom-modal').style.display = 'block';
-    modalCallback = cb;
-    setTimeout(() => inp.focus(), 100);
+function updateClock() {
+    document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('ar-EG');
 }
 
-function closeModal(confirm) {
-    const val = document.getElementById('modal-input').value;
-    document.getElementById('modal-overlay').style.display = 'none';
-    document.getElementById('custom-modal').style.display = 'none';
-    if(confirm && modalCallback) modalCallback(val);
-}
-
-// التحكم في الخزنة
-function askAdminPass() {
-    openModal("ادخل كلمة سر الخزنة", true, (val) => {
-        if(val === adminPass) {
-            document.getElementById('main-content-area').classList.add('hidden');
-            document.getElementById('admin-panel').classList.remove('hidden');
-            renderAdminStats();
-        } else { alert("خطأ! كلمة السر غير صحيحة."); }
-    });
-}
-
-function closeAdmin() {
-    document.getElementById('admin-panel').classList.add('hidden');
-    document.getElementById('main-content-area').classList.remove('hidden');
-}
-
-// الكراسي والعمليات
 function renderChairs() {
     document.getElementById('barbers-grid').innerHTML = chairs.map(c => `
-        <div class="barber-item" onclick="selectChair('${c}')">💺<br><b>${c}</b></div>
+        <div class="barber-item" onclick="login('${c.name}')">
+            <img src="${c.img}" onerror="this.src='https://via.placeholder.com/60'">
+            <h3>${c.name}</h3>
+        </div>
     `).join('');
 }
 
-function selectChair(name) {
-    currentUser = name;
-    document.getElementById('active-user-name').innerText = "العمل الحالي: " + name;
-    showScreen('work-screen');
-    updateUserTotal();
+function login(name) {
+    let chair = chairs.find(c => c.name === name);
+    let p = prompt(`كلمة السر يا برنس ${name}:`);
+    if (p === chair.pass) {
+        user = name;
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('work-screen').classList.remove('hidden');
+        document.getElementById('active-user').innerText = "البرنس " + name;
+        document.getElementById('active-img').src = chair.img;
+        updateUserTotal();
+    } else { alert("الباسورد ملوش علاقة بالحقيقة!"); }
 }
 
 function saveData() {
-    const amt = document.getElementById('amount').value;
-    if(!amt) return alert("ادخل المبلغ أولاً!");
-    const entry = {
-        chair: currentUser,
-        customer: document.getElementById('cust-name').value || "زبون",
+    let amt = document.getElementById('amount').value;
+    if (!amt) return alert("اكتب المبلغ!");
+    db.push({
+        barber: user,
         price: parseFloat(amt),
         time: new Date().getTime(),
         timeStr: new Date().toLocaleTimeString('ar-EG')
-    };
-    db.push(entry);
-    localStorage.setItem('mosad_v3_db', JSON.stringify(db));
+    });
+    localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
     document.getElementById('amount').value = "";
-    document.getElementById('cust-name').value = "";
     updateUserTotal();
-    alert("تم الحفظ في الخزنة بنجاح ✅");
+    alert("تم التسجيل في الخزنة ✅");
 }
 
-function renderAdminStats() {
-    const now = new Date().getTime();
-    const d = 86400000;
-    const calc = (days) => db.filter(r => (now - r.time) < (days * d)).reduce((a, b) => a + b.price, 0);
-
-    document.getElementById('s-day').innerText = calc(1) + " ج";
-    document.getElementById('s-week').innerText = calc(7) + " ج";
-    document.getElementById('s-month').innerText = calc(30) + " ج";
-    document.getElementById('s-year').innerText = calc(365) + " ج";
-
-    document.getElementById('money-log').innerHTML = db.slice(-20).reverse().map(l => `
-        <div class="log-line"><span>${l.chair}: ${l.price}ج</span> <small>${l.timeStr}</small></div>
-    `).join('');
-
-    document.getElementById('att-log').innerHTML = att.slice(-20).reverse().map(l => `
-        <div class="log-line"><span>${l.name}</span> <small>${l.timeStr}</small></div>
-    `).join('');
-}
-
-// تصفير السجلات
-function resetLogs(type) {
-    if(confirm("سيتم مسح البيانات نهائياً، هل أنت متأكد؟")) {
-        if(type === 'money') { db = []; localStorage.setItem('mosad_v3_db', JSON.stringify(db)); }
-        else { att = []; localStorage.setItem('mosad_v3_att', JSON.stringify(att)); }
+function askAdminPass() {
+    let p = prompt("باسورد الخزنة:");
+    if (p === '5050') {
+        document.getElementById('main-app').classList.add('hidden');
+        document.getElementById('admin-panel').classList.remove('hidden');
         renderAdminStats();
     }
 }
 
-// البصمة
+function renderAdminStats() {
+    let now = new Date().getTime();
+    const filter = (ms) => db.filter(r => (now - r.time) < ms).reduce((s, r) => s + r.price, 0);
+
+    document.getElementById('s-day').innerText = filter(86400000) + " ج";
+    document.getElementById('s-week').innerText = filter(604800000) + " ج";
+    document.getElementById('s-month').innerText = filter(2592000000) + " ج";
+    document.getElementById('s-year').innerText = filter(31536000000) + " ج";
+
+    document.getElementById('money-log').innerHTML = db.slice(-20).reverse().map(r => `
+        <div class="log-item">💰 ${r.barber}: ${r.price}ج <small>${r.timeStr}</small></div>
+    `).join('');
+}
+
 function openAttendance() {
-    openModal("اسم الموظف للحضور", false, (val) => {
-        if(val) {
-            att.push({ name: val, timeStr: new Date().toLocaleTimeString('ar-EG'), time: new Date().getTime() });
-            localStorage.setItem('mosad_v3_att', JSON.stringify(att));
-            alert("تم تسجيل الحضور يا " + val);
-        }
-    });
+    let name = prompt("سجل اسمك للحضور:");
+    if(name) {
+        att.push({ name, timeStr: new Date().toLocaleString('ar-EG') });
+        localStorage.setItem('mosad_attendance', JSON.stringify(att));
+        alert("تم تسجيل الحضور بنجاح!");
+    }
 }
 
 function addNewChair() {
-    openModal("اسم الكرسي الجديد", false, (val) => {
-        if(val) { chairs.push(val); localStorage.setItem('mosad_v3_chairs', JSON.stringify(chairs)); renderChairs(); }
-    });
+    let name = prompt("اسم الكرسي الجديد:");
+    let pass = prompt("باسورد الكرسي:");
+    if(name && pass) {
+        chairs.push({name, img: 'default.jpg', pass});
+        localStorage.setItem('mosad_chairs', JSON.stringify(chairs));
+        renderChairs();
+    }
 }
 
-function showScreen(id) {
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('work-screen').classList.add('hidden');
-    document.getElementById(id).classList.remove('hidden');
+function clearLog(type) {
+    if(confirm("تمسح السجل نهائياً؟")) {
+        if(type === 'money') { db = []; localStorage.setItem('mosad_mega_safe', '[]'); }
+        else { att = []; localStorage.setItem('mosad_attendance', '[]'); }
+        renderAdminStats();
+    }
 }
 
 function toggleTheme(init=false) {
@@ -135,8 +109,10 @@ function toggleTheme(init=false) {
     localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
 }
 
+function closeAdmin() { location.reload(); }
+
 function updateUserTotal() {
     let today = new Date().toDateString();
-    let sum = db.filter(r => r.chair === currentUser && new Date(r.time).toDateString() === today).reduce((a, b) => a + b.price, 0);
+    let sum = db.filter(r => r.barber === user && new Date(r.time).toDateString() === today).reduce((s, r) => s + r.price, 0);
     document.getElementById('u-today').innerText = sum;
 }
