@@ -3,80 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>خزنة ملوك الشياكة | Mosad Studio</title>
+    <title>Management System | Mosad Studio</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
-    <div class="background-glow"></div>
-    
-    <div class="top-nav">
-        <div id="digital-clock" class="clock-3d">00:00:00</div>
-        <button id="theme-btn" class="theme-toggle" onclick="toggleTheme()">🌙</button>
+    <div class="top-bar">
+        <div id="digital-clock">00:00:00</div>
+        <button class="theme-btn" onclick="toggleTheme()">🌙</button>
     </div>
 
-    <div class="app-container" id="main-app">
+    <div class="app-container" id="main-ui">
         <header>
-            <h1 class="glitch">Mosad <span>Studio</span></h1>
-            <p class="subtitle">عدّاد الفلوس مبيغلطش 😉</p>
+            <h1 class="main-logo">MOSAD <span>STUDIO</span></h1>
         </header>
 
-        <div id="login-screen" class="section-box fade-in">
-            <h2 class="text-center">مين البرنس اللي هيسجل؟</h2>
-            <div id="barbers-grid" class="barbers-grid">
+        <section id="login-screen" class="active-screen">
+            <div class="grid-container" id="chairs-grid">
                 </div>
-            
-            <div class="bottom-actions">
-                <button class="btn-creative-nav" onclick="openAttendance()">🕒 بصمة الحضور</button>
-                <button class="btn-creative-nav gold" onclick="askAdminPass()">🛡️ دخول الخزنة</button>
+            <div class="dock-actions">
+                <button class="btn-dock" onclick="handleAttendance()">🕒 تسجيل حضور</button>
+                <button class="btn-dock gold" onclick="accessAdmin()">🛡️ الإدارة</button>
             </div>
-        </div>
+        </section>
 
-        <div id="work-screen" class="hidden section-box fade-in">
-            <div class="user-profile">
-                <img id="active-img" src="mosad.jpg" alt="user">
-                <h2 id="active-user" class="gold-text"></h2>
+        <section id="work-screen" class="hidden">
+            <div class="profile-header">
+                <h2 id="active-user-display"></h2>
             </div>
-            <div class="glass-form">
-                <input type="text" id="cust-name" placeholder="اسم الزبون (اختياري)">
-                <input type="number" id="amount" placeholder="المبلغ ج.م" inputmode="numeric">
-                <button class="btn-glow" onclick="saveData()">سجل العملية 💸</button>
+            <div class="form-container">
+                <input type="text" id="cust-name" placeholder="اسم العميل">
+                <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
+                <button class="btn-action" onclick="saveTransaction()">إضافة العملية</button>
             </div>
-            <div class="mini-stats">
-                <p>رزقك النهاردة:</p>
-                <div class="money-val"><span id="u-today">0</span> ج.م</div>
+            <div class="stat-card-mini">
+                <label>إيراد اليوم</label>
+                <div id="u-today-val">0</div>
             </div>
-            <button class="btn-out" onclick="location.reload()">تسجيل خروج 🔙</button>
-        </div>
+            <button class="btn-flat" onclick="exitWork()">تسجيل خروج</button>
+        </section>
     </div>
 
-    <div id="admin-panel" class="hidden full-screen-admin fade-in">
-        <div class="admin-header">
-            <h2>الخزنة المركزية 📊</h2>
+    <div id="admin-panel" class="hidden admin-overlay">
+        <div class="admin-nav">
+            <h2>لوحة التحكم</h2>
             <button class="btn-close" onclick="closeAdmin()">إغلاق ×</button>
         </div>
 
-        <div class="report-grid">
-            <div class="report-card"><h3>اليوم</h3><span id="s-day">0</span></div>
-            <div class="report-card"><h3>الأسبوع</h3><span id="s-week">0</span></div>
-            <div class="report-card"><h3>الشهر</h3><span id="s-month">0</span></div>
-            <div class="report-card gold-border"><h3>السنة</h3><span id="s-year">0</span></div>
+        <div class="stats-overview">
+            <div class="s-box"><span>يومي</span><b id="s-day">0</b></div>
+            <div class="s-box"><span>أسبوعي</span><b id="s-week">0</b></div>
+            <div class="s-box"><span>شهري</span><b id="s-month">0</b></div>
+            <div class="s-box"><span>سنوي</span><b id="s-year">0</b></div>
         </div>
 
-        <div class="logs-container">
-            <div class="log-section">
-                <h3>💰 العمليات <button class="btn-clear" onclick="clearLog('money')">تصفير</button></h3>
-                <div id="money-log" class="scroll-list"></div>
+        <div class="data-logs">
+            <div class="log-card">
+                <div class="log-header">💰 الإيرادات <button onclick="clearData('money')">مسح</button></div>
+                <div id="money-log" class="list-viewer"></div>
             </div>
-            <div class="log-section">
-                <h3>🕒 الحضور <button class="btn-clear" onclick="clearLog('att')">تصفير</button></h3>
-                <div id="att-log" class="scroll-list"></div>
+            <div class="log-card">
+                <div class="log-header">🕒 الحضور <button onclick="clearData('att')">مسح</button></div>
+                <div id="att-log" class="list-viewer"></div>
             </div>
         </div>
 
-        <div class="admin-tools">
+        <div class="admin-footer">
             <button onclick="addNewChair()">+ إضافة كرسي</button>
-            <button onclick="window.print()">🖨️ طباعة التقارير</button>
+            <button onclick="window.print()">🖨️ طباعة</button>
         </div>
     </div>
 
