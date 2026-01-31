@@ -214,3 +214,10 @@ function changeAdminPass() {
         if(val) { adminPass = val; localStorage.setItem('mosad_admin_p', val); alert("تم التغيير بنجاح ✅"); }
     });
 }
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('Service Worker Registered!'))
+      .catch(err => console.log('Service Worker Failed!', err));
+  });
+}
