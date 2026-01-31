@@ -3,104 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mosad Studio | VIP System</title>
+    <title>Mosad Studio | Ultra Pro</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
-    <div class="background-glow"></div>
+    <div class="stars-bg"></div>
     
     <div id="modal-overlay" class="modal-overlay"></div>
-    <div id="custom-modal" class="creative-card-modal">
-        <div class="modal-content-wrapper">
-            <div class="modal-icon" id="modal-icon">✨</div>
-            <h3 id="modal-title"></h3>
-            <div class="input-wrapper">
-                <input type="text" id="modal-input" placeholder="اكتب هنا...">
-            </div>
-            <div class="modal-actions">
-                <button class="btn-confirm-shiny" onclick="closeModal(true)">تأكيد</button>
-                <button class="btn-cancel-flat" onclick="closeModal(false)">إلغاء</button>
-            </div>
+    <div id="custom-modal" class="fantasy-modal">
+        <div class="modal-glow"></div>
+        <div id="modal-icon" class="modal-icon-anim">✨</div>
+        <h3 id="modal-title"></h3>
+        <div class="input-container">
+            <input type="text" id="modal-input" placeholder=" ">
+            <label>اكتب هنا...</label>
+        </div>
+        <div class="modal-btns">
+            <button class="btn-neon-gold" onclick="closeModal(true)">تأكيد</button>
+            <button class="btn-neon-red" onclick="closeModal(false)">إغلاق</button>
         </div>
     </div>
 
     <div class="app-container">
-        <header class="main-header">
-            <div class="logo-area">
-                <h1 class="glitch">Mosad <span>Studio</span></h1>
-                <button id="theme-btn" class="theme-switcher" onclick="toggleTheme()">🌙</button>
+        <header>
+            <div class="top-bar">
+                <h1 class="logo-3d">Mosad <span>Studio</span></h1>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-icon">🌙</button>
             </div>
-            <nav class="quick-nav">
-                <div class="nav-item admin" onclick="openAdminAuth()">
-                    <span class="icon">🛡️</span>
-                    <span class="label">الإدارة</span>
-                </div>
-                <div class="nav-item attendance" onclick="openAttendance()">
-                    <span class="icon">🕒</span>
-                    <span class="label">البصمة</span>
-                </div>
-            </nav>
+            <div class="action-dock">
+                <button class="dock-item" onclick="openAdminAuth()">🛡️ <span>الإدارة</span></button>
+                <button class="dock-item" onclick="openAttendance()">🕒 <span>الحضور</span></button>
+            </div>
         </header>
 
-        <section id="login-screen" class="module-bundle">
-            <div class="bundle-header">💎 محطة العمل</div>
-            <div id="barbers-grid" class="chairs-grid"></div>
-        </section>
+        <div id="login-screen" class="main-content">
+            <div class="grid-label">إختر محطة العمل</div>
+            <div id="barbers-grid" class="fancy-grid"></div>
+        </div>
 
-        <section id="work-screen" class="hidden module-bundle fade-in">
-            <h2 id="active-user" class="active-tag"></h2>
-            <div class="glass-form">
-                <input type="text" id="cust-name" placeholder="اسم العميل">
-                <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
-                <button class="btn-main-action pulse" onclick="saveData()">تسجيل العملية 💰</button>
+        <div id="work-screen" class="hidden main-content fade-in">
+            <div class="work-card">
+                <h2 id="active-user"></h2>
+                <div class="input-box">
+                    <input type="text" id="cust-name" placeholder="اسم العميل">
+                    <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
+                </div>
+                <button class="btn-submit-3d" onclick="saveData()">إضافة للخزنة 💸</button>
             </div>
-            <div class="live-counter">الإجمالي: <span id="u-today">0</span> ج</div>
-            <button class="btn-back" onclick="showScreen('login-screen')">🔙 رجوع</button>
-        </section>
+            <div class="counter-display">الإجمالي اليومي: <span id="u-today">0</span> ج</div>
+            <button class="btn-return" onclick="showScreen('login-screen')">العودة للخلف</button>
+        </div>
 
-        <section id="admin-screen" class="hidden module-bundle fade-in">
+        <div id="admin-screen" class="hidden main-content fade-in">
             <div class="admin-top">
-                <h2 class="gold-text">الخزنة المركزية</h2>
-                <button class="btn-print-all" onclick="window.print()">🖨️ طباعة</button>
+                <h2>الخزنة المركزية</h2>
+                <button class="btn-print" onclick="window.print()">🖨️ طباعة التقارير</button>
             </div>
 
-            <div class="stats-overview" id="admin-stats"></div>
+            <div class="stats-grid" id="admin-stats"></div>
 
-            <div class="filter-panel">
-                <h4>🖨️ تقرير فترة مخصصة</h4>
-                <div class="date-row">
+            <div class="custom-report-box">
+                <h4>طباعة فترة محددة</h4>
+                <div class="date-flex">
                     <input type="date" id="date-from">
                     <input type="date" id="date-to">
                 </div>
-                <button class="btn-action-light" onclick="printCustomRange()">طباعة الفترة المحددة</button>
+                <button class="btn-custom-print" onclick="printCustomRange()">تحميل التقرير</button>
             </div>
-
-            <div id="chairs-detail-list"></div>
 
             <div class="dual-logs">
-                <div class="log-bundle">
-                    <div class="log-header">
-                        <h4>💰 الفلوس</h4>
-                        <button class="btn-reset-mini" onclick="resetLogs('money')">تصفير</button>
-                    </div>
-                    <div id="money-log" class="scroll-log"></div>
+                <div class="log-card">
+                    <div class="log-head">💰 الفلوس <button class="reset-icon" onclick="resetLogs('money')">🗑️</button></div>
+                    <div id="money-log" class="list-scroll"></div>
                 </div>
-                <div class="log-bundle">
-                    <div class="log-header">
-                        <h4>🕒 الحضور</h4>
-                        <button class="btn-reset-mini" onclick="resetLogs('att')">تصفير</button>
-                    </div>
-                    <div id="att-log" class="scroll-log"></div>
+                <div class="log-card">
+                    <div class="log-head">🕒 الحضور <button class="reset-icon" onclick="resetLogs('att')">🗑️</button></div>
+                    <div id="att-log" class="list-scroll"></div>
                 </div>
             </div>
 
-            <div class="admin-footer-btns">
-                <button class="btn-add" onclick="addNewChair()">+ إضافة كرسي</button>
-                <button class="btn-pass" onclick="changeAdminPass()">🔑 الباسورد</button>
+            <div class="admin-footer">
+                <button class="btn-footer" onclick="addNewChair()">+ كرسي</button>
+                <button class="btn-footer" onclick="changeAdminPass()">🔑 الباسورد</button>
             </div>
-            <button class="btn-back" onclick="showScreen('login-screen')">إغلاق</button>
-        </section>
+            <button class="btn-return" onclick="showScreen('login-screen')">إغلاق</button>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>
