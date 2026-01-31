@@ -1,37 +1,23 @@
-:root { --gold: #d4af37; --bg: #0a0a0a; --card: #151515; --text: #fff; }
-body.light-theme { --bg: #f0f2f5; --card: #ffffff; --text: #1a1a1a; }
+:root { --gold: #d4af37; --bg: #0a0a0a; --card: rgba(255,255,255,0.05); --text: #fff; }
+body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; margin: 0; }
 
-body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; margin: 0; transition: 0.3s; }
-
-.top-nav { display: flex; justify-content: space-between; padding: 15px 25px; background: rgba(0,0,0,0.3); border-bottom: 1px solid rgba(212,175,55,0.1); }
-.clock-glow { color: var(--gold); font-weight: 900; font-size: 1.2rem; text-shadow: 0 0 10px var(--gold); }
-
-.app-container { padding: 20px; max-width: 500px; margin: auto; }
-.logo { text-align: center; font-weight: 900; letter-spacing: 2px; margin-bottom: 30px; }
+.header-clock { text-align: center; padding: 15px; font-weight: 900; color: var(--gold); background: rgba(0,0,0,0.4); font-size: 1.2rem; }
+.app-container { padding: 20px; max-width: 480px; margin: auto; }
+.logo { text-align: center; font-weight: 900; letter-spacing: 2px; }
 .logo span { color: var(--gold); }
 
-.creative-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-.chair-card { 
-    background: var(--card); border: 1px solid rgba(255,255,255,0.05); 
-    padding: 30px 10px; border-radius: 25px; text-align: center; cursor: pointer;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: 0.3s;
-}
-.chair-card:active { transform: scale(0.9); border-color: var(--gold); }
+.chairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 30px; }
+.chair-item { background: var(--card); border: 1px solid rgba(212,175,55,0.3); padding: 30px 10px; border-radius: 20px; text-align: center; cursor: pointer; transition: 0.2s; }
+.chair-item:active { transform: scale(0.95); background: var(--gold); color: #000; }
 
 .admin-panel { position: fixed; inset: 0; background: var(--bg); z-index: 2000; padding: 20px; overflow-y: auto; }
-.stats-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
-.stat-item { background: var(--card); padding: 20px; border-radius: 20px; text-align: center; border-bottom: 3px solid var(--gold); }
-.stat-item b { color: var(--gold); font-size: 1.3rem; display: block; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0; }
+.stat-card { background: var(--card); padding: 15px; border-radius: 15px; text-align: center; border-bottom: 3px solid var(--gold); }
+.stat-card b { display: block; color: var(--gold); font-size: 1.2rem; }
 
-.scroll-v { height: 180px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 15px; padding: 10px; font-size: 0.8rem; margin-top: 10px; }
-.btn-submit { width: 100%; padding: 18px; background: var(--gold); border: none; border-radius: 15px; font-weight: 900; cursor: pointer; color: #000; }
-
+.scroll-area { height: 180px; overflow-y: auto; background: rgba(0,0,0,0.2); border-radius: 10px; padding: 10px; font-size: 0.8rem; margin-top: 10px; }
 .hidden { display: none !important; }
-.fade-in { animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in { animation: fadeIn 0.3s ease-in; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-/* تعديلات للطباعة */
-@media print {
-    .admin-actions, .btn-close { display: none; }
-    .admin-panel { position: static; height: auto; }
-}
+@media print { .admin-footer, .btn-close { display: none; } .admin-panel { position: static; } }
