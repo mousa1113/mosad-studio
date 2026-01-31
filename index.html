@@ -2,15 +2,22 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Mosad Studio | Pro</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
-     <link rel="manifest" href="manifest.json">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d4af37">
+    <link rel="apple-touch-icon" href="logo.png">
 </head>
 <body>
-    <div class="background-glow"></div>
+    <div class="background-overlay"></div>
     
+    <div id="install-container" class="install-banner hidden">
+        <p>قم بتثبيت التطبيق لسهولة الاستخدام</p>
+        <button onclick="installApp()" class="btn-glow-sm">تثبيت الآن 📲</button>
+    </div>
+
     <div id="modal-overlay" class="modal-overlay" onclick="closeModal(false)"></div>
     <div id="custom-modal" class="custom-modal">
         <h3 id="modal-title" style="color:var(--gold); margin-bottom:15px;"></h3>
@@ -38,39 +45,37 @@
         <div id="work-screen" class="hidden section-box">
             <h2 id="active-user" class="gold-text"></h2>
             <div class="main-form">
-                <input type="text" id="cust-name" class="creative-input" placeholder="اسم العميل">
+                <input type="text" id="cust-name" class="creative-input" placeholder="اسم العميل (اختياري)">
                 <input type="number" id="amount" class="creative-input" placeholder="المبلغ" inputmode="numeric">
                 <button class="btn-glow" onclick="saveData()">تسجيل العملية 💸</button>
             </div>
             <div class="mini-stats">
-                <p>إجمالي اليوم للكرسي: <span id="u-today" class="money-val">0</span> ج</p>
+                <p>إيراد اليوم للكرسي: <span id="u-today" class="money-val">0</span> ج</p>
             </div>
             <button class="btn-out" onclick="showScreen('login-screen')">🔙 رجوع</button>
         </div>
 
         <div id="admin-screen" class="hidden section-box">
             <div class="admin-header">
-                <h2 class="gold-text">الإدارة والتقارير</h2>
+                <h2 class="gold-text">لوحة التحكم</h2>
                 <div class="admin-controls">
-                    <button onclick="addNewChair()" class="btn-sm">+ كرسي جديد</button>
-                    <button onclick="changeAdminPass()" class="btn-sm">🔑 كلمة السر</button>
-                    <button onclick="resetAllData()" class="btn-sm" style="border-color:#ff4d4d; color:#ff4d4d;">🗑️ تصفير الحسابات</button>
+                    <button onclick="addNewChair()" class="btn-sm">+ كرسي</button>
+                    <button onclick="changeAdminPass()" class="btn-sm">🔑 الباسورد</button>
+                    <button onclick="resetAllData()" class="btn-sm" style="border-color:#ff4d4d; color:#ff4d4d;">🗑️ تصفير</button>
                 </div>
             </div>
 
             <div class="main-reports-grid" id="main-reports"></div>
-
             <hr style="border: 0.5px solid #333; margin: 20px 0;">
-
             <div id="chairs-reports"></div>
 
             <div class="dual-logs">
                 <div class="log-section">
-                    <h3>💰 سجل الفلوس</h3>
+                    <h3>💰 العمليات</h3>
                     <div id="money-log" class="list-wrapper"></div>
                 </div>
                 <div class="log-section">
-                    <h3>🕒 سجل الحضور</h3>
+                    <h3>🕒 الحضور</h3>
                     <div id="att-log" class="list-wrapper"></div>
                 </div>
             </div>
@@ -80,4 +85,3 @@
     <script src="script.js"></script>
 </body>
 </html>
-
