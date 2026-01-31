@@ -3,93 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mosad Studio | Ultra Pro</title>
+    <title>Mosad Studio | VIP</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
     <div class="stars-bg"></div>
     
-    <div id="modal-overlay" class="modal-overlay"></div>
-    <div id="custom-modal" class="fantasy-modal">
-        <div class="modal-glow"></div>
-        <div id="modal-icon" class="modal-icon-anim">✨</div>
-        <h3 id="modal-title"></h3>
-        <div class="input-container">
-            <input type="text" id="modal-input" placeholder=" ">
-            <label>اكتب هنا...</label>
-        </div>
-        <div class="modal-btns">
-            <button class="btn-neon-gold" onclick="closeModal(true)">تأكيد</button>
-            <button class="btn-neon-red" onclick="closeModal(false)">إغلاق</button>
-        </div>
-    </div>
+    <div class="top-clock" id="digital-clock">00:00:00</div>
 
-    <div class="app-container">
-        <header>
-            <div class="top-bar">
-                <h1 class="logo-3d">Mosad <span>Studio</span></h1>
-                <button class="theme-toggle-btn" onclick="toggleTheme()" id="theme-icon">🌙</button>
+    <div class="app-container" id="main-app">
+        <header id="site-header">
+            <div class="logo-area">
+                <h1 class="glitch">Mosad <span>Studio</span></h1>
+                <button id="theme-btn" onclick="toggleTheme()">🌙</button>
             </div>
-            <div class="action-dock">
-                <button class="dock-item" onclick="openAdminAuth()">🛡️ <span>الإدارة</span></button>
-                <button class="dock-item" onclick="openAttendance()">🕒 <span>الحضور</span></button>
-            </div>
+            <nav class="main-nav">
+                <button class="nav-item" onclick="openAdmin()">🛡️ الإدارة</button>
+                <button class="nav-item" onclick="openAttendance()">🕒 البصمة</button>
+            </nav>
         </header>
 
-        <div id="login-screen" class="main-content">
-            <div class="grid-label">إختر محطة العمل</div>
+        <section id="login-screen" class="glass-module">
+            <h3 class="title">💎 ابدأ العمل</h3>
             <div id="barbers-grid" class="fancy-grid"></div>
+        </section>
+
+        <section id="work-screen" class="hidden glass-module fade-in">
+            <h2 id="active-user" class="gold-text"></h2>
+            <div class="input-group">
+                <input type="number" id="amount" placeholder="ادخل المبلغ ج.م" inputmode="numeric">
+                <button class="btn-shiny-gold" onclick="saveData()">إضافة للخزنة 💸</button>
+            </div>
+            <div class="total-bar">إجمالي الكرسي: <span id="u-today">0</span> ج</div>
+            <button class="btn-cancel" onclick="showScreen('login-screen')">رجوع</button>
+        </section>
+    </div>
+
+    <div id="admin-panel" class="hidden full-admin-screen fade-in">
+        <div class="admin-header">
+            <h2 class="gold-text">الخزنة المركزية 💰</h2>
+            <button class="btn-close-admin" onclick="closeAdmin()">إغلاق الخزنة ✖</button>
         </div>
 
-        <div id="work-screen" class="hidden main-content fade-in">
-            <div class="work-card">
-                <h2 id="active-user"></h2>
-                <div class="input-box">
-                    <input type="text" id="cust-name" placeholder="اسم العميل">
-                    <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
-                </div>
-                <button class="btn-submit-3d" onclick="saveData()">إضافة للخزنة 💸</button>
-            </div>
-            <div class="counter-display">الإجمالي اليومي: <span id="u-today">0</span> ج</div>
-            <button class="btn-return" onclick="showScreen('login-screen')">العودة للخلف</button>
+        <div class="stats-grid">
+            <div class="stat-card"><span>يومي</span><b id="s-day">0</b></div>
+            <div class="stat-card"><span>أسبوعي</span><b id="s-week">0</b></div>
+            <div class="stat-card"><span>شهري</span><b id="s-month">0</b></div>
+            <div class="stat-card"><span>سنوي</span><b id="s-year">0</b></div>
         </div>
 
-        <div id="admin-screen" class="hidden main-content fade-in">
-            <div class="admin-top">
-                <h2>الخزنة المركزية</h2>
-                <button class="btn-print" onclick="window.print()">🖨️ طباعة التقارير</button>
+        <div class="logs-section">
+            <div class="log-box">
+                <div class="log-head">💰 سجل الإيرادات <button onclick="resetLogs('money')">🗑️</button></div>
+                <div id="money-log" class="list-scroll"></div>
             </div>
-
-            <div class="stats-grid" id="admin-stats"></div>
-
-            <div class="custom-report-box">
-                <h4>طباعة فترة محددة</h4>
-                <div class="date-flex">
-                    <input type="date" id="date-from">
-                    <input type="date" id="date-to">
-                </div>
-                <button class="btn-custom-print" onclick="printCustomRange()">تحميل التقرير</button>
+            <div class="log-box">
+                <div class="log-head">🕒 سجل الحضور <button onclick="resetLogs('att')">🗑️</button></div>
+                <div id="att-log" class="list-scroll"></div>
             </div>
+        </div>
 
-            <div class="dual-logs">
-                <div class="log-card">
-                    <div class="log-head">💰 الفلوس <button class="reset-icon" onclick="resetLogs('money')">🗑️</button></div>
-                    <div id="money-log" class="list-scroll"></div>
-                </div>
-                <div class="log-card">
-                    <div class="log-head">🕒 الحضور <button class="reset-icon" onclick="resetLogs('att')">🗑️</button></div>
-                    <div id="att-log" class="list-scroll"></div>
-                </div>
-            </div>
-
-            <div class="admin-footer">
-                <button class="btn-footer" onclick="addNewChair()">+ كرسي</button>
-                <button class="btn-footer" onclick="changeAdminPass()">🔑 الباسورد</button>
-            </div>
-            <button class="btn-return" onclick="showScreen('login-screen')">إغلاق</button>
+        <div class="admin-controls">
+            <button onclick="addNewChair()">+ إضافة كرسي</button>
+            <button onclick="changePass()">🔑 كلمة السر</button>
+            <button onclick="window.print()">🖨️ طباعة تقرير</button>
         </div>
     </div>
+
+    <div id="modal-overlay" class="modal-overlay"></div>
+    <div id="custom-modal" class="creative-modal">
+        <h3 id="modal-title"></h3>
+        <input type="text" id="modal-input">
+        <div class="modal-btns">
+            <button onclick="closeModal(true)" class="confirm">تأكيد</button>
+            <button onclick="closeModal(false)">إلغاء</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
