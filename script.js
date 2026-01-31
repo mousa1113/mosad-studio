@@ -1,117 +1,95 @@
-let salesDB = JSON.parse(localStorage.getItem('mosad_sales')) || [];
-let attendanceDB = JSON.parse(localStorage.getItem('mosad_att')) || [];
-let chairsDB = JSON.parse(localStorage.getItem('mosad_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
+let db = JSON.parse(localStorage.getItem('mosad_final_db')) || [];
+let att = JSON.parse(localStorage.getItem('mosad_final_att')) || [];
+let chairs = JSON.parse(localStorage.getItem('mosad_final_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
 let currentChair = "";
-let currentFilter = "الكل";
+let currentPeriod = "";
 
 window.onload = () => {
-    renderChairs();
+    renderMainGrid();
     setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('ar-EG'); }, 1000);
 };
 
-function renderChairs() {
-    document.getElementById('chairs-render').innerHTML = chairsDB.map(c => `
-        <div class="chair-box" onclick="goToWork('${c}')"><h3>${c}</h3></div>
-    `).join('');
+function renderMainGrid() {
+    document.getElementById('grid-chairs').innerHTML = chairs.map(c => `<div class="chair-unit" onclick="openChairWork('${c}')"><h3>${c}</h3></div>`).join('');
 }
 
-function goToWork(name) {
+function openChairWork(name) {
     currentChair = name;
-    document.getElementById('chair-label').innerText = name;
-    showScreen('work-screen');
-    updateChairTotal();
+    document.getElementById('current-chair-name').innerText = name;
+    showView('view-work');
+    updateChairSum();
 }
 
-function processSale() {
-    let amt = document.getElementById('cust-price').value;
-    let cust = document.getElementById('cust-name').value || "عميل";
+function confirmSale() {
+    let amt = document.getElementById('in-amt').value;
+    let cust = document.getElementById('in-cust').value || "بدون اسم";
     if(!amt) return;
-    salesDB.push({
-        chair: currentChair,
-        cust: cust,
-        price: parseFloat(amt),
-        ts: new Date().getTime(),
-        timeStr: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'}),
-        dateStr: new Date().toLocaleDateString('ar-EG')
-    });
-    localStorage.setItem('mosad_sales', JSON.stringify(salesDB));
-    document.getElementById('cust-price').value = ""; document.getElementById('cust-name').value = "";
-    updateChairTotal();
-    alert("تم التسجيل بالثانية والدقيقة ✅");
+    db.push({ chair: currentChair, cust: cust, price: parseFloat(amt), ts: new Date().getTime(), timeStr: new Date().toLocaleString('ar-EG') });
+    localStorage.setItem('mosad_final_db', JSON.stringify(db));
+    document.getElementById('in-amt').value = ""; document.getElementById('in-cust').value = "";
+    updateChairSum(); alert("تم تسجيل العملية بنجاح ✅");
 }
 
-function authAdmin() {
-    if(document.getElementById('admin-key').value === '5050') {
-        closeModal('admin-auth-modal');
-        document.getElementById('admin-dashboard').style.display = 'block';
-        renderDashTabs();
-        updateDashStats();
-    } else { alert("كلمة المرور خطأ!"); }
+function checkAuth() {
+    if(document.getElementById('pass-field').value === '5050') {
+        closePopup('pop-auth');
+        document.getElementById('admin-panel').style.display = 'block';
+        loadAllLogs();
+    } else { alert("خطأ!"); }
 }
 
-function renderDashTabs() {
-    let html = `<button class="t-btn ${currentFilter==='الكل'?'active':''}" onclick="setFilter('الكل')">الكل</button>`;
-    html += chairsDB.map(c => `<button class="t-btn ${currentFilter===c?'active':''}" onclick="setFilter('${c}')">${c}</button>`).join('');
-    document.getElementById('dash-tabs').innerHTML = html;
+// نظام التقارير اللي طلبته (تختار الفترة وبعدين الكرسي)
+function showReportOptions(period) {
+    currentPeriod = period;
+    document.getElementById('report-type-title').innerText = "تقرير " + period + " - اختر الكرسي:";
+    let html = `<button class="r-chair-btn" style="background:var(--gold); color:#000" onclick="filterReport('الكل')">كل الكراسي</button>`;
+    html += chairs.map(c => `<button class="r-chair-btn" onclick="filterReport('${c}')">${c}</button>`).join('');
+    document.getElementById('report-chair-btns').innerHTML = html;
+    document.getElementById('report-sub-menu').classList.remove('hidden');
 }
 
-function setFilter(f) {
-    currentFilter = f;
-    renderDashTabs();
-    updateDashStats();
-}
-
-function updateDashStats() {
+function filterReport(target) {
     const now = new Date().getTime();
-    const data = currentFilter === "الكل" ? salesDB : salesDB.filter(x => x.chair === currentFilter);
-    const sum = (ms) => data.filter(x => (now - x.ts) < ms).reduce((a, b) => a + b.price, 0);
+    let ms = 86400000; // يومي
+    if(currentPeriod === 'أسبوعي') ms = 604800000;
+    if(currentPeriod === 'شهري') ms = 2592000000;
+    if(currentPeriod === 'سنوي') ms = 31536000000;
 
-    document.getElementById('d-total').innerText = sum(86400000);
-    document.getElementById('w-total').innerText = sum(604800000);
-    document.getElementById('m-total').innerText = sum(2592000000);
-    document.getElementById('y-total').innerText = sum(31536000000);
+    let filtered = db.filter(x => (now - x.ts) < ms);
+    if(target !== 'الكل') filtered = filtered.filter(x => x.chair === target);
 
-    document.getElementById('sales-log').innerHTML = data.slice().reverse().map(i => `
-        <div style="border-bottom:1px solid #222; padding:5px"><b>${i.chair}</b>|${i.price}ج|${i.cust}<br><small>${i.dateStr} ${i.timeStr}</small></div>
-    `).join('');
+    let total = filtered.reduce((a, b) => a + b.price, 0);
+    alert("تقرير " + currentPeriod + " لـ (" + target + ")\nالإجمالي: " + total + " ج.م");
     
-    document.getElementById('att-log').innerHTML = attendanceDB.slice().reverse().map(a => `
-        <div style="border-bottom:1px solid #222; padding:5px">${a.user}<br><small>${a.time}</small></div>
+    // عرض النتائج في السجل للطباعة
+    document.getElementById('sales-log').innerHTML = filtered.slice().reverse().map(i => `
+        <div style="border-bottom:1px solid #333; padding:5px"><b>${i.chair}</b> | ${i.price}ج | ${i.cust} <br> <small>${i.timeStr}</small></div>
     `).join('');
 }
-
-function printData(p) { alert("تجهيز تقرير " + p + " لـ " + currentFilter); window.print(); }
 
 function addChair() {
-    let n = prompt("اسم الكرسي الجديد:");
-    if(n) { chairsDB.push(n); localStorage.setItem('mosad_chairs', JSON.stringify(chairsDB)); renderChairs(); renderDashTabs(); }
+    let n = prompt("اسم الكرسي:");
+    if(n) { chairs.push(n); localStorage.setItem('mosad_final_chairs', JSON.stringify(chairs)); renderMainGrid(); }
 }
 
 function delChair() {
-    let n = prompt("اكتب اسم الكرسي المراد حذفه:");
-    if(["الكرسي 1", "الكرسي 2", "الكرسي 3"].includes(n)) return alert("ممنوع حذف الكراسي الأساسية!");
-    chairsDB = chairsDB.filter(x => x !== n);
-    localStorage.setItem('mosad_chairs', JSON.stringify(chairsDB)); renderChairs(); renderDashTabs();
+    let n = prompt("اسم الكرسي لحذفه:");
+    if(["الكرسي 1", "الكرسي 2", "الكرسي 3"].includes(n)) return alert("أساسي!");
+    chairs = chairs.filter(x => x !== n);
+    localStorage.setItem('mosad_final_chairs', JSON.stringify(chairs)); renderMainGrid();
 }
 
-function showScreen(id) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-function closeModal(id) { document.getElementById(id).style.display = 'none'; }
-function closeDashboard() { document.getElementById('admin-dashboard').style.display = 'none'; }
-
-function confirmAtt() {
-    let u = document.getElementById('staff-user').value;
-    if(u) {
-        attendanceDB.push({user: u, time: new Date().toLocaleString('ar-EG')});
-        localStorage.setItem('mosad_att', JSON.stringify(attendanceDB));
-        closeModal('attendance-modal'); alert("تم الحضور ✅");
-    }
+function openPopup(id) { document.getElementById(id).style.display = 'flex'; }
+function closePopup(id) { document.getElementById(id).style.display = 'none'; }
+function showView(id) { document.querySelectorAll('.view').forEach(v => v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+function closeAdmin() { document.getElementById('admin-panel').style.display = 'none'; }
+function updateChairSum() {
+    let today = new Date().toDateString();
+    let s = db.filter(x => x.chair === currentChair && new Date(x.ts).toDateString() === today).reduce((a,b)=>a+b.price, 0);
+    document.getElementById('chair-sum-val').innerText = s;
 }
-
-function updateChairTotal() {
-    let today = new Date().toLocaleDateString('ar-EG');
-    let s = salesDB.filter(x => x.chair === currentChair && x.dateStr === today).reduce((a,b)=>a+b.price, 0);
-    document.getElementById('chair-day-total').innerText = s + " ج.م";
+function loadAllLogs() {
+    document.getElementById('sales-log').innerHTML = db.slice().reverse().map(i => `<div>${i.chair}|${i.price}ج|${i.cust}</div>`).join('');
+    document.getElementById('att-log').innerHTML = att.slice().reverse().map(a => `<div>${a.name}|${a.time}</div>`).join('');
 }
-
-function resetData(t) { if(confirm("مسح السجلات؟")) { if(t==='money') salesDB=[]; else attendanceDB=[]; localStorage.setItem(t==='money'?'mosad_sales':'mosad_att', '[]'); updateDashStats(); } }
+function resetData(t) { if(confirm("مسح؟")) { if(t==='sales') db=[]; else att=[]; localStorage.setItem(t==='sales'?'mosad_final_db':'mosad_final_att', '[]'); loadAllLogs(); } }
