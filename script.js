@@ -1,4 +1,4 @@
-// استعادة البيانات أو إنشاء مصفوفات فارغة
+// استعادة البيانات
 let db = JSON.parse(localStorage.getItem('mosad_db')) || [];
 let attendance = JSON.parse(localStorage.getItem('mosad_att')) || [];
 let chairs = JSON.parse(localStorage.getItem('mosad_chairs')) || ["كرسي 1", "كرسي 2", "كرسي 3"];
@@ -6,14 +6,45 @@ let adminPass = localStorage.getItem('mosad_admin_p') || '5050';
 
 let currentUser = "";
 let currentCallback = null;
+let deferredPrompt; // متغير لحفظ حدث التثبيت
 
-window.onload = () => renderChairs();
+// عند تحميل الصفحة
+window.onload = () => {
+    renderChairs();
+    
+    // كود تسجيل Service Worker
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('/sw.js')
+            .then(() => console.log('Service Worker Ready'))
+            .catch(err => console.log('SW Failed', err));
+    }
+};
 
+// كود التعامل مع التثبيت (PWA Install)
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    // إظهار زر التثبيت
+    document.getElementById('install-container').classList.remove('hidden');
+});
+
+async function installApp() {
+    if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+            document.getElementById('install-container').classList.add('hidden');
+        }
+        deferredPrompt = null;
+    }
+}
+
+// باقي دوال النظام الأساسية
 function renderChairs() {
     const grid = document.getElementById('barbers-grid');
     grid.innerHTML = chairs.map(c => `
         <div class="barber-item" onclick="selectChair('${c}')">
-            <div style="font-size:1.5rem">💺</div>
+            <div style="font-size:2rem">💺</div>
             <h3>${c}</h3>
         </div>
     `).join('');
@@ -36,7 +67,7 @@ function saveData() {
         customer: document.getElementById('cust-name').value || "عميل",
         price: parseFloat(amt),
         time: now.getTime(),
-        dateStr: now.toLocaleDateString('ar-EG'), // تسجيل التاريخ عند الحفظ
+        dateStr: now.toLocaleDateString('ar-EG'),
         timeStr: now.toLocaleTimeString('ar-EG')
     });
     
@@ -44,63 +75,57 @@ function saveData() {
     document.getElementById('amount').value = "";
     document.getElementById('cust-name').value = "";
     updateUserTotal();
-    alert("تم تسجيل العملية بنجاح ✅");
+    alert("✅ تم التسجيل");
 }
 
 function renderAdminStats() {
     const now = new Date().getTime();
     const dMs = 86400000;
-    
-    // دالة لحساب الإجمالي حسب عدد الأيام
     const getSum = (days) => db.filter(r => (now - r.time) < (days * dMs)).reduce((s, r) => s + r.price, 0);
 
-    // تحديث التقارير الكلية
     document.getElementById('main-reports').innerHTML = `
-        <div class="total-card"><h4>إجمالي اليوم</h4><span class="val">${getSum(1)}ج</span><button class="btn-print-sm" onclick="printReport('اليوم', 1)">طباعة</button></div>
-        <div class="total-card"><h4>إجمالي الأسبوع</h4><span class="val">${getSum(7)}ج</span><button class="btn-print-sm" onclick="printReport('الأسبوع', 7)">طباعة</button></div>
-        <div class="total-card"><h4>إجمالي الشهر</h4><span class="val">${getSum(30)}ج</span><button class="btn-print-sm" onclick="printReport('الشهر', 30)">طباعة</button></div>
-        <div class="total-card"><h4>إجمالي السنة</h4><span class="val">${getSum(365)}ج</span><button class="btn-print-sm" onclick="printReport('السنة', 365)">طباعة</button></div>
+        <div class="total-card"><h4>اليوم</h4><span class="val">${getSum(1)}ج</span><button class="btn-print-sm" onclick="printReport('اليوم', 1)">طباعة</button></div>
+        <div class="total-card"><h4>الأسبوع</h4><span class="val">${getSum(7)}ج</span><button class="btn-print-sm" onclick="printReport('الأسبوع', 7)">طباعة</button></div>
+        <div class="total-card"><h4>الشهر</h4><span class="val">${getSum(30)}ج</span><button class="btn-print-sm" onclick="printReport('الشهر', 30)">طباعة</button></div>
+        <div class="total-card"><h4>السنة</h4><span class="val">${getSum(365)}ج</span><button class="btn-print-sm" onclick="printReport('السنة', 365)">طباعة</button></div>
     `;
 
-    // تحديث تقارير الكراسي
     let chairsHtml = "";
     chairs.forEach((c, index) => {
         const chairData = db.filter(r => r.chair === c);
         const daily = chairData.filter(r => (now - r.time) < dMs).reduce((s,r) => s+r.price, 0);
-        
-        // زر الحذف يظهر فقط للكراسي المضافة حديثاً
-        const delBtn = index > 2 ? `<button onclick="removeChair('${c}')" style="color:#ff4d4d; background:none; border:none; cursor:pointer; font-size:0.7rem;">❌ حذف</button>` : "";
+        const delBtn = index > 2 ? `<button onclick="removeChair('${c}')" style="color:#ff4d4d; background:none; border:none; cursor:pointer;">❌</button>` : "";
 
         chairsHtml += `
             <div class="chair-detail-card">
-                <div style="display:flex; justify-content:space-between; align-items:center;">
+                <div style="display:flex; justify-content:space-between;">
                     <strong style="color:var(--gold)">${c}</strong>
                     ${delBtn}
                 </div>
-                <p style="font-size:0.8rem; margin:10px 0;">إيراد اليوم: ${daily} ج</p>
-                <button onclick="printChairReport('${c}')" class="btn-sm" style="width:100%;">🖨️ طباعة سجل الكرسي</button>
+                <p>اليوم: ${daily} ج</p>
+                <button onclick="printChairReport('${c}')" class="btn-sm" style="width:100%;">🖨️ طباعة السجل</button>
             </div>`;
     });
     document.getElementById('chairs-reports').innerHTML = chairsHtml;
 
-    // سجلات الأموال مع حماية ضد الـ undefined
     document.getElementById('money-log').innerHTML = db.slice(-15).reverse().map(l => `
-        <div class="log-entry">💰 <span>${l.chair}</span>: ${l.price}ج <br> <small>${l.dateStr || new Date(l.time).toLocaleDateString('ar-EG')} | ${l.timeStr || new Date(l.time).toLocaleTimeString('ar-EG')}</small></div>
+        <div class="log-entry">
+            <span>${l.chair}</span> 
+            <div>${l.price}ج <small style="color:#777">(${l.timeStr || '--'})</small></div>
+        </div>
     `).join('');
 
-    // سجل البصمة
     document.getElementById('att-log').innerHTML = attendance.slice(-15).reverse().map(l => `
         <div class="log-entry">🕒 ${l.name} <br> <small>${new Date(l.time).toLocaleString('ar-EG')}</small></div>
     `).join('');
 }
 
-// نظام الطباعة الاحترافي
 function openPrintWindow(content) {
     const win = window.open('', '_blank');
     win.document.write(`
-        <html><head><title>تقرير Mosad Studio</title>
-        <style>body { font-family: 'Cairo', sans-serif; direction: rtl; padding: 20px; } table { width: 100%; border-collapse: collapse; margin-top: 15px; } th, td { border: 1px solid #ddd; padding: 8px; text-align: center; } th { background-color: #f2f2f2; }</style>
-        </head><body><h1 style="text-align:center;">Mosad Studio</h1><hr>${content}</body></html>
+        <html><head><title>تقرير</title>
+        <style>body{font-family:'Cairo';direction:rtl;padding:20px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #ddd;padding:5px;text-align:center}</style>
+        </head><body><h2 style="text-align:center">Mosad Studio</h2>${content}</body></html>
     `);
     win.document.close();
     win.print();
@@ -110,75 +135,59 @@ function printReport(period, days) {
     const now = new Date().getTime();
     const data = db.filter(r => (now - r.time) < (days * 86400000));
     const total = data.reduce((s,r) => s+r.price, 0);
-    
-    let content = `<h2>إجمالي تقرير ${period}</h2><h3>إجمالي المبالغ: ${total} جنيه</h3>`;
-    content += `<table><tr><th>الكرسي</th><th>العميل</th><th>المبلغ</th><th>التاريخ</th></tr>
-                ${data.map(r => `<tr><td>${r.chair}</td><td>${r.customer}</td><td>${r.price}ج</td><td>${r.dateStr || new Date(r.time).toLocaleDateString('ar-EG')}</td></tr>`).join('')}
-                </table>`;
-    openPrintWindow(content);
+    openPrintWindow(`<h3>تقرير ${period} (الإجمالي: ${total}ج)</h3><table><tr><th>الكرسي</th><th>المبلغ</th><th>التاريخ</th></tr>${data.map(r=>`<tr><td>${r.chair}</td><td>${r.price}</td><td>${r.dateStr}</td></tr>`).join('')}</table>`);
 }
 
 function printChairReport(name) {
     const data = db.filter(r => r.chair === name);
     const total = data.reduce((s,r) => s+r.price, 0);
-    
-    let content = `<h2>سجل عمليات: ${name}</h2><h3>الإجمالي: ${total} جنيه</h3>`;
-    content += `<table><tr><th>العميل</th><th>المبلغ</th><th>اليوم</th><th>الوقت</th></tr>
-                ${data.map(r => `<tr><td>${r.customer}</td><td>${r.price}ج</td><td>${r.dateStr || new Date(r.time).toLocaleDateString('ar-EG')}</td><td>${r.timeStr || new Date(r.time).toLocaleTimeString('ar-EG')}</td></tr>`).join('')}
-                </table>`;
-    openPrintWindow(content);
+    openPrintWindow(`<h3>سجل ${name} (الإجمالي: ${total}ج)</h3><table><tr><th>العميل</th><th>المبلغ</th><th>التاريخ</th></tr>${data.map(r=>`<tr><td>${r.customer}</td><td>${r.price}</td><td>${r.dateStr}</td></tr>`).join('')}</table>`);
 }
 
-// وظائف الإدارة
 function resetAllData() {
-    if(confirm("⚠️ هل أنت متأكد من مسح جميع الحسابات؟ لا يمكن التراجع!")) {
-        db = [];
-        attendance = [];
-        localStorage.setItem('mosad_db', JSON.stringify(db));
-        localStorage.setItem('mosad_att', JSON.stringify(attendance));
+    if(confirm("مسح كل البيانات؟")) {
+        db = []; attendance = [];
+        localStorage.setItem('mosad_db', JSON.stringify([]));
+        localStorage.setItem('mosad_att', JSON.stringify([]));
         renderAdminStats();
-        alert("تم تصفير الحسابات ✅");
     }
 }
 
 function openAttendance() {
-    openCustomModal("سجل اسم الموظف للبصمة", false, (val) => {
+    openCustomModal("اسم الموظف", false, (val) => {
         if(val) {
             attendance.push({ name: val, time: new Date().getTime() });
             localStorage.setItem('mosad_att', JSON.stringify(attendance));
-            alert("تم تسجيل الحضور ✅");
+            alert("تم تسجيل الحضور");
         }
     });
 }
 
 function openAdminAuth() {
-    openCustomModal("كلمة سر الإدارة", true, (val) => {
+    openCustomModal("كلمة السر", true, (val) => {
         if(val === adminPass) { showScreen('admin-screen'); renderAdminStats(); }
-        else alert("كلمة السر خطأ!");
+        else alert("خطأ!");
     });
 }
 
 function addNewChair() {
-    openCustomModal("اسم الكرسي الجديد", false, (val) => {
+    openCustomModal("اسم الكرسي", false, (val) => {
         if(val) {
             chairs.push(val);
             localStorage.setItem('mosad_chairs', JSON.stringify(chairs));
-            renderChairs();
-            renderAdminStats();
+            renderChairs(); renderAdminStats();
         }
     });
 }
 
 function removeChair(name) {
-    if(confirm(`حذف ${name} نهائياً؟`)) {
+    if(confirm(`حذف ${name}؟`)) {
         chairs = chairs.filter(c => c !== name);
         localStorage.setItem('mosad_chairs', JSON.stringify(chairs));
-        renderChairs();
-        renderAdminStats();
+        renderChairs(); renderAdminStats();
     }
 }
 
-// المساعدات
 function openCustomModal(title, isPassword, callback) {
     document.getElementById('modal-title').innerText = title;
     const input = document.getElementById('modal-input');
@@ -211,13 +220,6 @@ function updateUserTotal() {
 
 function changeAdminPass() {
     openCustomModal("كلمة السر الجديدة", true, (val) => {
-        if(val) { adminPass = val; localStorage.setItem('mosad_admin_p', val); alert("تم التغيير بنجاح ✅"); }
+        if(val) { adminPass = val; localStorage.setItem('mosad_admin_p', val); alert("تم التغيير"); }
     });
-}
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js')
-      .then(reg => console.log('Service Worker Registered!'))
-      .catch(err => console.log('Service Worker Failed!', err));
-  });
 }
