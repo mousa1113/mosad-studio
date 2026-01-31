@@ -3,75 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSAD STUDIO | Professional ERP</title>
+    <title>MOSAD STUDIO | Ultimate Version</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body class="dark-theme">
-    <div class="header">
-        <div class="logo-area">MOSAD <span>STUDIO</span></div>
-        <div id="clock" class="digital-clock">00:00:00</div>
-    </div>
+    <div class="glow-overlay"></div>
+    
+    <header class="top-header">
+        <div class="neon-logo">MOSAD <span>STUDIO</span></div>
+        <div id="clock" class="neo-time">00:00:00</div>
+    </header>
 
-    <main class="main-container" id="app">
+    <main class="container">
         <section id="home-view" class="view active">
-            <div class="chairs-grid" id="main-grid"></div>
-            <div class="main-dock">
-                <button class="dock-btn att" onclick="recordAtt()">🕒 بصمة</button>
-                <button class="dock-btn vault" onclick="openVault()">🛡️ الخزنة</button>
+            <div class="chairs-grid" id="main-grid">
+                </div>
+            <div class="main-actions">
+                <button class="btn-neo pulse" onclick="recordAtt()">🕒 بصمة</button>
+                <button class="btn-neo gold" onclick="enterVault()">🛡️ الخزنة</button>
             </div>
         </section>
 
-        <section id="entry-view" class="view">
-            <div class="creative-card fade-in">
-                <div class="card-header"><h2 id="active-chair-name">الكرسي 1</h2></div>
-                <div class="animated-inputs">
-                    <div class="input-group">
-                        <input type="text" id="cust-info" required>
-                        <label>اسم العميل أو الرقم</label>
+        <section id="work-view" class="view">
+            <div class="glass-card">
+                <div class="card-head">
+                    <h2 id="current-chair">الكرسي 1</h2>
+                    <span class="status-dot">نشط</span>
+                </div>
+                <div class="creative-inputs">
+                    <div class="field">
+                        <input type="text" id="cust-name" placeholder=" " required>
+                        <label>اسم العميل / رقم الهاتف</label>
                     </div>
-                    <div class="input-group">
-                        <input type="number" id="cash-amt" required>
+                    <div class="field">
+                        <input type="number" id="cust-amt" placeholder=" " required inputmode="numeric">
                         <label>المبلغ (EGP)</label>
                     </div>
                 </div>
-                <button class="push-btn" onclick="saveOp()">تأكيد العملية ⚡</button>
-                <div class="quick-total">إيراد اليوم: <span id="chair-daily-sum">0</span> ج.م</div>
-                <button class="back-btn" onclick="goHome()">رجوع للرئيسية</button>
+                <button class="btn-confirm" onclick="saveTransaction()">تأكيد العملية ⚡</button>
+                <div class="daily-info">إيرادك اليوم: <b id="chair-sum">0</b> ج</div>
+                <button class="btn-exit" onclick="showHome()">🔙 رجوع للرئيسية</button>
             </div>
         </section>
     </main>
 
     <div id="vault-panel" class="vault-overlay">
-        <div class="vault-nav">
-            <h2>إدارة التقارير الذكية</h2>
-            <button class="close-x" onclick="closeVault()">×</button>
+        <div class="vault-header">
+            <h3>إحصائيات الإدارة</h3>
+            <button class="close-btn" onclick="closeVault()">✕</button>
         </div>
 
-        <div class="chair-filter" id="chair-tabs"></div>
+        <div class="chair-tabs" id="tabs"></div>
 
-        <div class="stats-dynamic" id="stats-display">
-            <div class="stat-bubble" onclick="printFiltered('day')"><span>يومي</span><b id="v-day">0</b></div>
-            <div class="stat-bubble" onclick="printFiltered('week')"><span>أسبوعي</span><b id="v-week">0</b></div>
-            <div class="stat-bubble" onclick="printFiltered('month')"><span>شهري</span><b id="v-month">0</b></div>
-            <div class="stat-bubble gold" onclick="printFiltered('year')"><span>سنوي</span><b id="v-year">0</b></div>
+        <div class="stats-mini-grid">
+            <div class="mini-card" onclick="printFiltered('يومي')"><span>يومي</span><b id="v-day">0</b></div>
+            <div class="mini-card" onclick="printFiltered('أسبوعي')"><span>أسبوعي</span><b id="v-week">0</b></div>
+            <div class="mini-card" onclick="printFiltered('شهري')"><span>شهري</span><b id="v-month">0</b></div>
+            <div class="mini-card gold" onclick="printFiltered('سنوي')"><span>سنوي</span><b id="v-year">0</b></div>
         </div>
 
-        <div class="logs-split">
-            <div class="log-tile">
-                <div class="tile-head">💰 الإيرادات <button onclick="resetDB('money')">تصفير</button></div>
-                <div id="money-log" class="list-container"></div>
+        <div class="data-split">
+            <div class="log-box">
+                <div class="log-h">💰 مبيعات <button onclick="clearDB('money')">مسح</button></div>
+                <div id="money-log" class="inner-scroll"></div>
             </div>
-            <div class="log-tile">
-                <div class="tile-head">🕒 الحضور <button onclick="resetDB('att')">تصفير</button></div>
-                <div id="att-log" class="list-container"></div>
+            <div class="log-box">
+                <div class="log-h">🕒 حضور <button onclick="clearDB('att')">مسح</button></div>
+                <div id="att-log" class="inner-scroll"></div>
             </div>
         </div>
 
-        <div class="admin-tools">
-            <button class="tool-btn add" onclick="addChair()">+ إضافة كرسي</button>
-            <button class="tool-btn del" onclick="delChair()">- حذف كرسي</button>
-            <button class="tool-btn print-all" onclick="window.print()">🖨️ طباعة شاملة</button>
+        <div class="admin-btns">
+            <button class="tool-btn add" onclick="addChair()">➕ إضافة</button>
+            <button class="tool-btn del" onclick="delChair()">➖ حذف</button>
+            <button class="tool-btn print" onclick="window.print()">🖨️ طباعة</button>
         </div>
     </div>
 
