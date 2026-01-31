@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="manifest" href="manifest.json">
-    <title>خزنة ملوك الشياكة | Dashboard</title>
+    <title>نظام إدارة الصالون | Professional</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
@@ -12,86 +11,57 @@
     <div class="background-glow"></div>
     <div class="app-container">
         <header>
-            <h1 class="glitch">Mosad <span>Studio</span></h1>
-            <p class="subtitle">عدّاد الفلوس مبيغلطش 😉</p>
+            <h1 class="glitch">Studio <span>Management</span></h1>
+            <div class="top-nav">
+                <button class="nav-btn" onclick="showAdmin()">🛡️ لوحة الإدارة</button>
+                <button class="nav-btn" onclick="showAttendance()">🕒 تسجيل حضور</button>
+            </div>
         </header>
 
         <div id="login-screen" class="section-box">
-            <h2 class="text-center">مين البرنس اللي هيسجل؟</h2>
-            <div class="barbers-grid">
-                <div class="barber-item" onclick="login('مسعد')">
-                    <div class="avatar"><img src="mosad.jpg" alt="مسعد"></div>
-                    <h3>مسعد</h3>
-                    <small>الكنج</small>
+            <h2 class="text-center">اختر الكرسي للبدء</h2>
+            <div id="barbers-grid" class="barbers-grid">
                 </div>
-                <div class="barber-item" onclick="login('محمد')">
-                    <div class="avatar"><img src="mohamed.jpg" alt="محمد"></div>
-                    <h3>محمد</h3>
-                    <small>الفنان</small>
-                </div>
-                <div class="barber-item" onclick="login('محمود')">
-                    <div class="avatar"><img src="mahmoud.jpg" alt="محمود"></div>
-                    <h3>محمود</h3>
-                    <small>الصاروخ</small>
-                </div>
-            </div>
         </div>
 
         <div id="work-screen" class="hidden section-box fade-in">
             <div class="profile-header">
-                <img id="active-img" src="" alt="">
                 <h2 id="active-user"></h2>
             </div>
             
             <div class="main-form">
-                <label>الزبون ده مين؟</label>
-                <input type="text" id="cust-name" placeholder="اسم البرنس اللي اتحلقله">
-                
-                <label>دفع كام؟</label>
-                <input type="number" id="amount" placeholder="المبلغ كاش يا معلم" inputmode="numeric">
-                
-                <button class="btn-glow" onclick="saveData()">سجل العملية في الخزنة 💸</button>
+                <label>تفاصيل الخدمة</label>
+                <input type="text" id="cust-name" placeholder="اسم العميل (اختياري)">
+                <input type="number" id="amount" placeholder="المبلغ المدفوع" inputmode="numeric">
+                <button class="btn-glow" onclick="saveData()">تسجيل العملية 💸</button>
             </div>
 
             <div class="mini-stats">
-                <p>رزقك النهاردة لغاية دلوقتي:</p>
+                <p>إجمالي إيراد الكرسي اليوم:</p>
                 <div class="money-val"><span id="u-today">0</span> ج.م</div>
             </div>
 
-            <button class="btn-special hidden" id="admin-btn" onclick="showAdmin()">👑 لوحة تحكم الكنج مسعد</button>
-            <button class="btn-out" onclick="location.reload()">تسجيل خروج 🔙</button>
+            <button class="btn-out" onclick="showScreen('login-screen')">🔙 العودة للرئيسية</button>
         </div>
 
         <div id="admin-screen" class="hidden section-box fade-in">
-            <h2 class="gold-text">كشف حساب المحل 📊</h2>
+            <h2 class="gold-text">تقرير الإيرادات الشامل 📊</h2>
             
-            <div class="report-grid">
-                <div class="report-card"><h3>اليوم</h3><span id="s-day">0</span></div>
-                <div class="report-card"><h3>الأسبوع</h3><span id="s-week">0</span></div>
-                <div class="report-card"><h3>الشهر</h3><span id="s-month">0</span></div>
-                <div class="report-card gold-border"><h3>السنة</h3><span id="s-year">0</span></div>
+            <div class="admin-controls">
+                <button onclick="addNewChair()" class="btn-sm">➕ إضافة كرسي</button>
+                <button onclick="changeAdminPass()" class="btn-sm">🔑 تغيير الباسورد</button>
             </div>
 
-            <div class="admin-tools">
-                <h3>إعدادات الأمان 🔐</h3>
-                <div class="pass-grid">
-                    <button onclick="changePass('مسعد')">تغيير باسورد مسعد</button>
-                    <button onclick="changePass('محمد')">تغيير باسورد محمد</button>
-                    <button onclick="changePass('محمود')">تغيير باسورد محمود</button>
+            <div class="report-grid" id="admin-stats">
                 </div>
-            </div>
             
             <div class="history-box">
-                <h3>شريط العمليات (بالثانية)</h3>
+                <h3>سجل العمليات والحضور</h3>
                 <div class="list-wrapper" id="log-body"></div>
             </div>
-            
-            <button class="btn-clear" onclick="clearAllData()">تصفير الخزنة نهائياً 🧹</button>
-            <button class="btn-out" onclick="hideAdmin()">رجوع للرئيسية</button>
+            <button class="btn-out" onclick="showScreen('login-screen')">رجوع</button>
         </div>
     </div>
     <script src="script.js"></script>
 </body>
 </html>
-
-
