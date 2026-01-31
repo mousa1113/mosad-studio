@@ -3,68 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MOSAD STUDIO | Ultimate Management</title>
+    <title>MOSAD STUDIO PRO</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body class="dark-mode">
-    <div class="glow-bg"></div>
+    <div class="blur-bg"></div>
     
-    <div class="neo-header">
-        <div id="clock" class="neo-clock">00:00:00</div>
-        <div class="header-logo">MOSAD <span>STUDIO</span></div>
-    </div>
+    <header class="main-nav">
+        <div class="neo-logo">MOSAD <span>STUDIO</span></div>
+        <div id="clock" class="digital-watch">00:00:00</div>
+    </header>
 
-    <main class="container" id="main-content">
-        <section id="selection-screen" class="active-view">
-            <div class="grid-layout" id="chairs-container"></div>
-            <div class="quick-nav">
-                <button class="nav-btn attendance-btn" onclick="openAtt()">🕒 بصمة</button>
-                <button class="nav-btn admin-btn" onclick="goAdmin()">🛡️ الإدارة</button>
+    <main id="app">
+        <section id="chairs-view" class="view active">
+            <div class="grid-container" id="chairs-grid"></div>
+            <div class="control-dock">
+                <button class="btn-creative b-att" onclick="recordAtt()">🕒 الحضور</button>
+                <button class="btn-creative b-admin" onclick="authAdmin()">🛡️ الخزنة</button>
             </div>
         </section>
 
-        <section id="work-screen" class="hidden-view">
-            <div class="glass-card">
-                <h2 id="current-chair-title">الكرسي</h2>
-                <div class="input-stack">
-                    <input type="number" id="val-amount" placeholder="المبلغ (EGP)" inputmode="numeric">
-                    <button class="action-trigger" onclick="commitMoney()">تأكيد العملية 💰</button>
+        <section id="action-view" class="view">
+            <div class="glass-box fade-in">
+                <h2 id="target-chair"></h2>
+                <div class="input-wrapper">
+                    <input type="text" id="cust-info" placeholder="اسم العميل / الرقم">
+                    <input type="number" id="cash-val" placeholder="المبلغ" inputmode="numeric">
                 </div>
-                <div class="stat-indicator">إجمالي اليوم: <span id="u-total">0</span></div>
-                <button class="back-link" onclick="location.reload()">تسجيل خروج</button>
+                <button class="btn-push" onclick="submitCash()">تأكيد العملية 💰</button>
+                <div class="chair-today">إجمالي اليوم: <span id="chair-sum">0</span> ج.م</div>
+                <button class="btn-back" onclick="showChairs()">🔙 رجوع</button>
             </div>
         </section>
     </main>
 
-    <div id="admin-view" class="hidden-view full-overlay">
-        <div class="overlay-header">
-            <h2>الخزنة والتقارير</h2>
-            <button class="exit-btn" onclick="exitAdmin()">إغلاق</button>
+    <div id="admin-panel" class="admin-overlay">
+        <div class="admin-top">
+            <h2>إدارة الحسابات والتقارير</h2>
+            <button class="close-overlay" onclick="hideAdmin()">×</button>
         </div>
 
-        <div class="summary-grid">
-            <div class="sum-item"><span>اليوم</span><b id="d-val">0</b></div>
-            <div class="sum-item"><span>الأسبوع</span><b id="w-val">0</b></div>
-            <div class="sum-item"><span>الشهر</span><b id="m-val">0</b></div>
-            <div class="sum-item neo"><span>السنة</span><b id="y-val">0</b></div>
+        <div class="stats-row">
+            <div class="s-card" onclick="printReport('day')"><span>اليوم</span><b id="r-day">0</b></div>
+            <div class="s-card" onclick="printReport('week')"><span>الأسبوع</span><b id="r-week">0</b></div>
+            <div class="s-card" onclick="printReport('month')"><span>الشهر</span><b id="r-month">0</b></div>
+            <div class="s-card neon" onclick="printReport('year')"><span>السنة</span><b id="r-year">0</b></div>
         </div>
 
-        <div class="table-section">
-            <div class="table-card">
-                <div class="table-h">💰 سجل الإيرادات <button onclick="resetData('money')">🗑️</button></div>
-                <div id="money-list" class="list-data"></div>
+        <div class="logs-grid">
+            <div class="log-panel">
+                <div class="panel-h">💰 سجل الإيرادات <button onclick="resetDB('money')">تصفير</button></div>
+                <div id="money-log" class="scroll-v"></div>
             </div>
-            <div class="table-card">
-                <div class="table-h">🕒 سجل الحضور <button onclick="resetData('att')">🗑️</button></div>
-                <div id="att-list" class="list-data"></div>
+            <div class="log-panel">
+                <div class="panel-h">🕒 سجل الحضور <button onclick="resetDB('att')">تصفير</button></div>
+                <div id="att-log" class="scroll-v"></div>
             </div>
         </div>
 
-        <div class="control-footer">
-            <button onclick="addChair()">+ إضافة كرسي</button>
-            <button class="danger" onclick="delChair()">- حذف كرسي</button>
-            <button class="print-btn" onclick="window.print()">🖨️ طباعة السجلات</button>
+        <div class="footer-tools">
+            <button onclick="addChair()">➕ إضافة كرسي</button>
+            <button onclick="delChair()">➖ حذف كرسي</button>
+            <button class="btn-print-all" onclick="window.print()">🖨️ طباعة السجل الكامل</button>
         </div>
     </div>
 
