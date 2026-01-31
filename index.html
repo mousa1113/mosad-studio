@@ -3,74 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>خزنة ملوك الشياكة | Dashboard</title>
+    <title>Management System | Mosad Studio</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="background-glow"></div>
-    <div class="top-header">
-        <div id="digital-clock">00:00:00</div>
-        <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+<body class="dark-theme">
+    <div class="top-nav">
+        <div id="digital-clock" class="clock-glow">00:00:00</div>
+        <button class="theme-switch" onclick="toggleTheme()">🌙/☀️</button>
     </div>
 
     <div class="app-container" id="main-ui">
         <header>
-            <h1 class="glitch">Mosad <span>Studio</span></h1>
+            <h1 class="logo">MOSAD <span>STUDIO</span></h1>
         </header>
 
-        <div id="login-screen" class="section-box">
-            <h2 class="text-center">اختر المحطة</h2>
-            <div class="barbers-grid" id="chairs-grid">
+        <section id="login-screen" class="active-section">
+            <div id="chairs-grid" class="creative-grid">
                 </div>
-            <div class="main-actions">
-                <button class="btn-attendance" onclick="markAttendance()">🕒 تسجيل حضور</button>
-                <button class="btn-admin-gate" onclick="showAdmin()">🛡️ دخول الخزنة</button>
+            <div class="action-bar">
+                <button class="btn-main" onclick="recordAttendance()">🕒 تسجيل حضور</button>
+                <button class="btn-main gold" onclick="openAdmin()">🛡️ الإدارة</button>
             </div>
-        </div>
+        </section>
 
-        <div id="work-screen" class="hidden section-box fade-in">
-            <h2 id="active-user" class="gold-text"></h2>
-            <div class="input-group">
-                <input type="text" id="cust-name" placeholder="اسم الزبون">
-                <input type="number" id="amount" placeholder="المبلغ" inputmode="numeric">
-                <button class="btn-glow" onclick="saveData()">سجل العملية 💸</button>
+        <section id="work-screen" class="hidden fade-in">
+            <div class="work-header">
+                <h2 id="active-user-name"></h2>
+                <div class="user-badge">نشط الآن</div>
             </div>
-            <div class="mini-stats">
-                <p>إجمالي اليوم:</p>
-                <div class="money-val"><span id="u-today">0</span> ج.م</div>
+            <div class="creative-form">
+                <div class="input-field">
+                    <input type="text" id="cust-name" placeholder=" ">
+                    <label>اسم العميل</label>
+                </div>
+                <div class="input-field">
+                    <input type="number" id="amount" placeholder=" " inputmode="numeric">
+                    <label>المبلغ (ج.م)</label>
+                </div>
+                <button class="btn-submit" onclick="saveData()">إضافة العملية 💸</button>
             </div>
-            <button class="btn-out" onclick="location.reload()">تسجيل خروج 🔙</button>
-        </div>
+            <div class="daily-card">
+                <small>إجمالي الكرسي اليوم</small>
+                <div id="u-today">0</div>
+            </div>
+            <button class="btn-exit" onclick="location.reload()">تسجيل خروج 🔙</button>
+        </section>
     </div>
 
-    <div id="admin-screen" class="hidden admin-overlay">
+    <div id="admin-panel" class="hidden admin-panel">
         <div class="admin-header">
-            <h2 class="gold-text">كشف الحساب 📊</h2>
-            <button onclick="closeAdmin()" class="btn-close">إغلاق ×</button>
-        </div>
-        
-        <div class="report-grid">
-            <div class="report-card"><h3>اليوم</h3><span id="s-day">0</span></div>
-            <div class="report-card"><h3>الأسبوع</h3><span id="s-week">0</span></div>
-            <div class="report-card"><h3>الشهر</h3><span id="s-month">0</span></div>
-            <div class="report-card"><h3>السنة</h3><span id="s-year">0</span></div>
+            <h2>إحصائيات الإدارة</h2>
+            <button class="btn-close" onclick="closeAdmin()">×</button>
         </div>
 
-        <div class="log-container">
-            <div class="log-box">
-                <h3>💰 العمليات <button onclick="clearLog('money')">🗑️</button></h3>
-                <div id="log-body" class="list-wrapper"></div>
+        <div class="stats-container">
+            <div class="stat-item"><span>اليوم</span><b id="s-day">0</b></div>
+            <div class="stat-item"><span>الأسبوع</span><b id="s-week">0</b></div>
+            <div class="stat-item"><span>الشهر</span><b id="s-month">0</b></div>
+            <div class="stat-item"><span>السنة</span><b id="s-year">0</b></div>
+        </div>
+
+        <div class="logs-wrapper">
+            <div class="log-column">
+                <div class="log-title">💰 سجل المبيعات <button onclick="clearData('money')">🗑️ تصفير</button></div>
+                <div id="money-log" class="scroll-v"></div>
             </div>
-            <div class="log-box">
-                <h3>🕒 الحضور <button onclick="clearLog('att')">🗑️</button></h3>
-                <div id="att-body" class="list-wrapper"></div>
+            <div class="log-column">
+                <div class="log-title">🕒 سجل الحضور <button onclick="clearData('att')">🗑️ تصفير</button></div>
+                <div id="att-log" class="scroll-v"></div>
             </div>
         </div>
 
-        <div class="admin-footer">
+        <div class="admin-actions">
             <button onclick="addNewChair()">+ إضافة كرسي</button>
-            <button onclick="window.print()">🖨️ طباعة التقرير</button>
+            <button onclick="deleteChair()">- حذف كرسي</button>
+            <button onclick="window.print()">🖨️ طباعة تقرير</button>
         </div>
     </div>
 
