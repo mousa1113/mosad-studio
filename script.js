@@ -1,99 +1,98 @@
-let db = JSON.parse(localStorage.getItem('ms_studio_db')) || [];
-let att = JSON.parse(localStorage.getItem('ms_studio_att')) || [];
-let chairs = JSON.parse(localStorage.getItem('ms_studio_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
-let currentUser = "";
+let dataStore = JSON.parse(localStorage.getItem('mosad_pro_db')) || [];
+let attStore = JSON.parse(localStorage.getItem('mosad_pro_att')) || [];
+let chairList = JSON.parse(localStorage.getItem('mosad_pro_chairs')) || ["كرسي 1", "كرسي 2", "كرسي 3"];
+let activeChair = "";
 
 window.onload = () => {
-    renderChairs();
-    setInterval(() => {
-        document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('ar-EG');
-    }, 1000);
+    refreshChairs();
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString('ar-EG'); }, 1000);
 };
 
-function renderChairs() {
-    document.getElementById('chairs-grid').innerHTML = chairs.map(c => `<div class="chair-item" onclick="selectChair('${c}')"><h3>${c}</h3></div>`).join('');
+function refreshChairs() {
+    document.getElementById('chairs-container').innerHTML = chairList.map(c => `
+        <div class="chair-box" onclick="enterChair('${c}')">
+            <div class="icon">💺</div>
+            <h3>${c}</h3>
+        </div>
+    `).join('');
 }
 
-function selectChair(name) {
-    currentUser = name;
-    document.getElementById('login-screen').classList.add('hidden');
-    document.getElementById('work-screen').classList.remove('hidden');
-    document.getElementById('active-user-display').innerText = name;
-    updateUserTotal();
+function enterChair(name) {
+    activeChair = name;
+    document.getElementById('selection-screen').classList.add('hidden-view');
+    document.getElementById('work-screen').classList.remove('hidden-view');
+    document.getElementById('current-chair-title').innerText = name;
+    updateChairTotal();
 }
 
-function saveTransaction() {
-    let amt = document.getElementById('amount').value;
-    if(!amt) return alert("ادخل المبلغ");
-    db.push({
-        user: currentUser,
-        price: parseFloat(amt),
-        time: new Date().getTime(),
-        dateStr: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'})
+function commitMoney() {
+    let val = document.getElementById('val-amount').value;
+    if(!val) return;
+    dataStore.push({
+        chair: activeChair,
+        amount: parseFloat(val),
+        ts: new Date().getTime(),
+        timeStr: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'})
     });
-    localStorage.setItem('ms_studio_db', JSON.stringify(db));
-    document.getElementById('amount').value = "";
-    updateUserTotal();
-    alert("تم التسجيل ✅");
+    localStorage.setItem('mosad_pro_db', JSON.stringify(dataStore));
+    document.getElementById('val-amount').value = "";
+    updateChairTotal();
 }
 
-function openAdmin() {
-    if(prompt("كلمة سر الإدارة:") === '5050') {
-        document.getElementById('main-view').classList.add('hidden');
-        document.getElementById('admin-panel').classList.remove('hidden');
-        renderAdminStats();
+function goAdmin() {
+    if(prompt("كلمة السر:") === '5050') {
+        document.getElementById('main-content').classList.add('hidden-view');
+        document.getElementById('admin-view').classList.remove('hidden-view');
+        loadReports();
     }
 }
 
-function renderAdminStats() {
-    const now = new Date().getTime();
-    const filter = (ms) => db.filter(r => (now - r.time) < ms).reduce((a, b) => a + b.price, 0);
+function loadReports() {
+    let now = new Date().getTime();
+    const calc = (ms) => dataStore.filter(x => (now - x.ts) < ms).reduce((a, b) => a + b.amount, 0);
 
-    document.getElementById('s-day').innerText = filter(86400000) + " ج";
-    document.getElementById('s-week').innerText = filter(604800000) + " ج";
-    document.getElementById('s-month').innerText = filter(2592000000) + " ج";
-    document.getElementById('s-year').innerText = filter(31536000000) + " ج";
+    document.getElementById('d-val').innerText = calc(86400000) + " ج";
+    document.getElementById('w-val').innerText = calc(604800000) + " ج";
+    document.getElementById('m-val').innerText = calc(2592000000) + " ج";
+    document.getElementById('y-val').innerText = calc(31536000000) + " ج";
 
-    document.getElementById('money-log').innerHTML = db.slice().reverse().map(r => `<div>${r.user}: ${r.price}ج | ${r.dateStr}</div>`).join('');
-    document.getElementById('att-log').innerHTML = att.slice().reverse().map(a => `<div>${a.name} | ${a.time}</div>`).join('');
+    document.getElementById('money-list').innerHTML = dataStore.slice().reverse().map(i => `
+        <div class="data-row"><span>${i.chair}</span> <b>${i.amount}ج</b> <small>${i.timeStr}</small></div>
+    `).join('');
 }
 
-function recordAttendance() {
-    let n = prompt("اسم الموظف:");
-    if(n) {
-        att.push({ name: n, time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'}) });
-        localStorage.setItem('ms_studio_att', JSON.stringify(att));
-        alert("تم الحضور");
+function addChair() {
+    let n = prompt("اسم الكرسي الجديد:");
+    if(n) { chairList.push(n); localStorage.setItem('mosad_pro_chairs', JSON.stringify(chairList)); refreshChairs(); }
+}
+
+function delChair() {
+    let n = prompt("اسم الكرسي للحذف:");
+    chairList = chairList.filter(x => x !== n);
+    localStorage.setItem('mosad_pro_chairs', JSON.stringify(chairList));
+    refreshChairs();
+}
+
+function resetData(type) {
+    if(confirm("سيتم تصفير السجل نهائياً؟")) {
+        if(type === 'money') dataStore = []; else attStore = [];
+        localStorage.setItem(type === 'money' ? 'mosad_pro_db' : 'mosad_pro_att', '[]');
+        loadReports();
     }
 }
 
-function addNewChair() {
-    let n = prompt("اسم الكرسي:");
-    if(n) { chairs.push(n); localStorage.setItem('ms_studio_chairs', JSON.stringify(chairs)); renderChairs(); }
-}
-
-function removeChair() {
-    let n = prompt("اكتب اسم الكرسي لحذفه:");
-    chairs = chairs.filter(c => c !== n);
-    localStorage.setItem('ms_studio_chairs', JSON.stringify(chairs));
-    renderChairs();
-}
-
-function clearData(type) {
-    if(confirm("تصفير البيانات؟")) {
-        if(type==='money') { db=[]; localStorage.setItem('ms_studio_db','[]'); }
-        else { att=[]; localStorage.setItem('ms_studio_att','[]'); }
-        renderAdminStats();
-    }
-}
-
-function closeAdmin() { 
-    document.getElementById('admin-panel').classList.add('hidden');
-    document.getElementById('main-view').classList.remove('hidden');
-}
-
-function updateUserTotal() {
+function exitAdmin() { location.reload(); }
+function updateChairTotal() {
     let today = new Date().toDateString();
-    let sum = db.filter(r => r.user === currentUser && new Date(r.time).toDateString() === today).reduce((a,b)=>a+b.price, 0);
-    document.getElementById('u-today').innerText = sum + " ج.م";
+    let total = dataStore.filter(x => x.chair === activeChair && new Date(x.ts).toDateString() === today).reduce((a, b) => a + b.amount, 0);
+    document.getElementById('u-total').innerText = total + " ج.م";
+}
+
+function openAtt() {
+    let n = prompt("الاسم للبصمة:");
+    if(n) {
+        attStore.push({name: n, time: new Date().toLocaleTimeString('ar-EG')});
+        localStorage.setItem('mosad_pro_att', JSON.stringify(attStore));
+        alert("تم تسجيل الحضور ✅");
+    }
 }
