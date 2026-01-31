@@ -1,51 +1,45 @@
-let db = JSON.parse(localStorage.getItem('m_studio_db')) || [];
-let att = JSON.parse(localStorage.getItem('m_studio_att')) || [];
-let chairs = JSON.parse(localStorage.getItem('m_studio_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
+let db = JSON.parse(localStorage.getItem('ms_studio_db')) || [];
+let att = JSON.parse(localStorage.getItem('ms_studio_att')) || [];
+let chairs = JSON.parse(localStorage.getItem('ms_studio_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
 let currentUser = "";
 
 window.onload = () => {
-    updateClock();
-    setInterval(updateClock, 1000);
     renderChairs();
-    if(localStorage.getItem('theme') === 'light') toggleTheme(true);
+    setInterval(() => {
+        document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('ar-EG');
+    }, 1000);
 };
 
-function updateClock() {
-    document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('ar-EG');
-}
-
 function renderChairs() {
-    const grid = document.getElementById('chairs-grid');
-    grid.innerHTML = chairs.map(c => `<div class="chair-card" onclick="selectChair('${c}')"><h3>${c}</h3></div>`).join('');
+    document.getElementById('chairs-grid').innerHTML = chairs.map(c => `<div class="chair-item" onclick="selectChair('${c}')"><h3>${c}</h3></div>`).join('');
 }
 
 function selectChair(name) {
     currentUser = name;
     document.getElementById('login-screen').classList.add('hidden');
     document.getElementById('work-screen').classList.remove('hidden');
-    document.getElementById('active-user-name').innerText = name;
+    document.getElementById('active-user-display').innerText = name;
     updateUserTotal();
 }
 
-function saveData() {
+function saveTransaction() {
     let amt = document.getElementById('amount').value;
-    if(!amt) return alert("يرجى إدخال المبلغ");
+    if(!amt) return alert("ادخل المبلغ");
     db.push({
         user: currentUser,
-        cust: document.getElementById('cust-name').value || "عميل",
         price: parseFloat(amt),
         time: new Date().getTime(),
-        fullTime: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'})
+        dateStr: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'})
     });
-    localStorage.setItem('m_studio_db', JSON.stringify(db));
+    localStorage.setItem('ms_studio_db', JSON.stringify(db));
     document.getElementById('amount').value = "";
-    document.getElementById('cust-name').value = "";
     updateUserTotal();
-    alert("تم الحفظ بنجاح ✅");
+    alert("تم التسجيل ✅");
 }
 
 function openAdmin() {
     if(prompt("كلمة سر الإدارة:") === '5050') {
+        document.getElementById('main-view').classList.add('hidden');
         document.getElementById('admin-panel').classList.remove('hidden');
         renderAdminStats();
     }
@@ -60,50 +54,44 @@ function renderAdminStats() {
     document.getElementById('s-month').innerText = filter(2592000000) + " ج";
     document.getElementById('s-year').innerText = filter(31536000000) + " ج";
 
-    document.getElementById('money-log').innerHTML = db.slice().reverse().map(r => `
-        <div style="border-bottom:1px solid #333; padding:5px">${r.user}: ${r.price}ج | ${r.fullTime}</div>
-    `).join('');
-
-    document.getElementById('att-log').innerHTML = att.slice().reverse().map(a => `
-        <div style="border-bottom:1px solid #333; padding:5px">${a.name} | ${a.time}</div>
-    `).join('');
+    document.getElementById('money-log').innerHTML = db.slice().reverse().map(r => `<div>${r.user}: ${r.price}ج | ${r.dateStr}</div>`).join('');
+    document.getElementById('att-log').innerHTML = att.slice().reverse().map(a => `<div>${a.name} | ${a.time}</div>`).join('');
 }
 
 function recordAttendance() {
-    let name = prompt("اسم الموظف:");
-    if(name) {
-        att.push({ name, time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'}) });
-        localStorage.setItem('m_studio_att', JSON.stringify(att));
-        alert("تم تسجيل حضورك");
+    let n = prompt("اسم الموظف:");
+    if(n) {
+        att.push({ name: n, time: new Date().toLocaleTimeString('ar-EG', {hour:'2-digit', minute:'2-digit', second:'2-digit'}) });
+        localStorage.setItem('ms_studio_att', JSON.stringify(att));
+        alert("تم الحضور");
     }
 }
 
 function addNewChair() {
-    let n = prompt("اسم الكرسي الجديد:");
-    if(n) { chairs.push(n); localStorage.setItem('m_studio_chairs', JSON.stringify(chairs)); renderChairs(); }
+    let n = prompt("اسم الكرسي:");
+    if(n) { chairs.push(n); localStorage.setItem('ms_studio_chairs', JSON.stringify(chairs)); renderChairs(); }
 }
 
-function deleteChair() {
-    let n = prompt("اسم الكرسي المراد حذفه:");
+function removeChair() {
+    let n = prompt("اكتب اسم الكرسي لحذفه:");
     chairs = chairs.filter(c => c !== n);
-    localStorage.setItem('m_studio_chairs', JSON.stringify(chairs));
+    localStorage.setItem('ms_studio_chairs', JSON.stringify(chairs));
     renderChairs();
 }
 
 function clearData(type) {
-    if(confirm("هل تريد تصفير البيانات نهائياً؟")) {
-        if(type === 'money') { db = []; localStorage.setItem('m_studio_db', '[]'); }
-        else { att = []; localStorage.setItem('m_studio_att', '[]'); }
+    if(confirm("تصفير البيانات؟")) {
+        if(type==='money') { db=[]; localStorage.setItem('ms_studio_db','[]'); }
+        else { att=[]; localStorage.setItem('ms_studio_att','[]'); }
         renderAdminStats();
     }
 }
 
-function toggleTheme(init=false) {
-    if(!init) document.body.classList.toggle('light-theme');
-    localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+function closeAdmin() { 
+    document.getElementById('admin-panel').classList.add('hidden');
+    document.getElementById('main-view').classList.remove('hidden');
 }
 
-function closeAdmin() { document.getElementById('admin-panel').classList.add('hidden'); }
 function updateUserTotal() {
     let today = new Date().toDateString();
     let sum = db.filter(r => r.user === currentUser && new Date(r.time).toDateString() === today).reduce((a,b)=>a+b.price, 0);
