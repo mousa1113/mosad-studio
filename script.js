@@ -1,15 +1,12 @@
-let db = JSON.parse(localStorage.getItem('mosad_mega_safe')) || [];
-let att = JSON.parse(localStorage.getItem('mosad_attendance')) || [];
-let chairs = JSON.parse(localStorage.getItem('mosad_chairs')) || [
-    {name: 'مسعد', img: 'mosad.jpg', pass: '7007'},
-    {name: 'محمد', img: 'mohamed.jpg', pass: '1397'},
-    {name: 'محمود', img: 'mahmoud.jpg', pass: '1593'}
-];
-let user = "";
+let db = JSON.parse(localStorage.getItem('ms_data')) || [];
+let attendance = JSON.parse(localStorage.getItem('ms_att')) || [];
+let chairs = JSON.parse(localStorage.getItem('ms_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
+let currentUser = "";
 
 window.onload = () => {
-    renderChairs();
+    updateClock();
     setInterval(updateClock, 1000);
+    renderChairs();
     if(localStorage.getItem('theme') === 'light') toggleTheme(true);
 };
 
@@ -18,88 +15,84 @@ function updateClock() {
 }
 
 function renderChairs() {
-    document.getElementById('barbers-grid').innerHTML = chairs.map(c => `
-        <div class="barber-item" onclick="login('${c.name}')">
-            <img src="${c.img}" onerror="this.src='https://via.placeholder.com/60'">
-            <h3>${c.name}</h3>
+    const grid = document.getElementById('chairs-grid');
+    grid.innerHTML = chairs.map(c => `
+        <div class="chair-btn" onclick="selectUser('${c}')">
+            <b>${c}</b>
         </div>
     `).join('');
 }
 
-function login(name) {
-    let chair = chairs.find(c => c.name === name);
-    let p = prompt(`كلمة السر يا برنس ${name}:`);
-    if (p === chair.pass) {
-        user = name;
+function selectUser(name) {
+    let p = prompt(`كلمة المرور الخاصة بـ ${name}:`);
+    if(p === '1234' || name === 'الكرسي 1') { // عدل الباسوردات هنا
+        currentUser = name;
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('work-screen').classList.remove('hidden');
-        document.getElementById('active-user').innerText = "البرنس " + name;
-        document.getElementById('active-img').src = chair.img;
+        document.getElementById('active-user-display').innerText = name;
         updateUserTotal();
-    } else { alert("الباسورد ملوش علاقة بالحقيقة!"); }
+    }
 }
 
-function saveData() {
+function saveTransaction() {
     let amt = document.getElementById('amount').value;
-    if (!amt) return alert("اكتب المبلغ!");
+    if(!amt) return alert("يرجى إدخال المبلغ");
     db.push({
-        barber: user,
+        user: currentUser,
         price: parseFloat(amt),
         time: new Date().getTime(),
-        timeStr: new Date().toLocaleTimeString('ar-EG')
+        dateStr: new Date().toLocaleString('ar-EG')
     });
-    localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
+    localStorage.setItem('ms_data', JSON.stringify(db));
     document.getElementById('amount').value = "";
     updateUserTotal();
-    alert("تم التسجيل في الخزنة ✅");
+    alert("تم التسجيل");
 }
 
-function askAdminPass() {
-    let p = prompt("باسورد الخزنة:");
-    if (p === '5050') {
-        document.getElementById('main-app').classList.add('hidden');
+function accessAdmin() {
+    let p = prompt("كلمة مرور الإدارة:");
+    if(p === '5050') {
         document.getElementById('admin-panel').classList.remove('hidden');
         renderAdminStats();
     }
 }
 
 function renderAdminStats() {
-    let now = new Date().getTime();
-    const filter = (ms) => db.filter(r => (now - r.time) < ms).reduce((s, r) => s + r.price, 0);
+    const now = new Date().getTime();
+    const filter = (ms) => db.filter(r => (now - r.time) < ms).reduce((a, b) => a + b.price, 0);
 
     document.getElementById('s-day').innerText = filter(86400000) + " ج";
     document.getElementById('s-week').innerText = filter(604800000) + " ج";
     document.getElementById('s-month').innerText = filter(2592000000) + " ج";
     document.getElementById('s-year').innerText = filter(31536000000) + " ج";
 
-    document.getElementById('money-log').innerHTML = db.slice(-20).reverse().map(r => `
-        <div class="log-item">💰 ${r.barber}: ${r.price}ج <small>${r.timeStr}</small></div>
+    document.getElementById('money-log').innerHTML = db.slice().reverse().map(r => `
+        <div style="padding:5px; border-bottom:1px solid #333">${r.user}: ${r.price}ج - ${r.dateStr}</div>
     `).join('');
 }
 
-function openAttendance() {
-    let name = prompt("سجل اسمك للحضور:");
+function handleAttendance() {
+    let name = prompt("اسم الموظف:");
     if(name) {
-        att.push({ name, timeStr: new Date().toLocaleString('ar-EG') });
-        localStorage.setItem('mosad_attendance', JSON.stringify(att));
-        alert("تم تسجيل الحضور بنجاح!");
+        attendance.push({ name, time: new Date().toLocaleString('ar-EG') });
+        localStorage.setItem('ms_att', JSON.stringify(attendance));
+        alert("تم تسجيل الحضور");
     }
 }
 
 function addNewChair() {
     let name = prompt("اسم الكرسي الجديد:");
-    let pass = prompt("باسورد الكرسي:");
-    if(name && pass) {
-        chairs.push({name, img: 'default.jpg', pass});
-        localStorage.setItem('mosad_chairs', JSON.stringify(chairs));
+    if(name) {
+        chairs.push(name);
+        localStorage.setItem('ms_chairs', JSON.stringify(chairs));
         renderChairs();
     }
 }
 
-function clearLog(type) {
-    if(confirm("تمسح السجل نهائياً؟")) {
-        if(type === 'money') { db = []; localStorage.setItem('mosad_mega_safe', '[]'); }
-        else { att = []; localStorage.setItem('mosad_attendance', '[]'); }
+function clearData(type) {
+    if(confirm("هل أنت متأكد؟")) {
+        if(type === 'money') { db = []; localStorage.setItem('ms_data', '[]'); }
+        else { attendance = []; localStorage.setItem('ms_att', '[]'); }
         renderAdminStats();
     }
 }
@@ -109,10 +102,10 @@ function toggleTheme(init=false) {
     localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
 }
 
-function closeAdmin() { location.reload(); }
-
+function closeAdmin() { document.getElementById('admin-panel').classList.add('hidden'); }
+function exitWork() { location.reload(); }
 function updateUserTotal() {
     let today = new Date().toDateString();
-    let sum = db.filter(r => r.barber === user && new Date(r.time).toDateString() === today).reduce((s, r) => s + r.price, 0);
-    document.getElementById('u-today').innerText = sum;
+    let sum = db.filter(r => r.user === currentUser && new Date(r.time).toDateString() === today).reduce((a,b)=>a+b.price, 0);
+    document.getElementById('u-today-val').innerText = sum + " ج.م";
 }
