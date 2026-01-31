@@ -2,7 +2,7 @@
   "name": "Mosad Studio Pro",
   "short_name": "Mosad Studio",
   "description": "نظام الإدارة المالية المتطور لستوديو مسعد",
-  "start_url": "/",
+  "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#d4af37",
@@ -21,4 +21,3 @@
     }
   ]
 }
-
