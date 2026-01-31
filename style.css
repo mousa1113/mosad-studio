@@ -1,70 +1,72 @@
 :root {
     --primary: #d4af37;
-    --bg: #0f0f0f;
-    --card: #1a1a1a;
+    --bg: #0a0a0a;
+    --card: #151515;
     --text: #ffffff;
-    --border: rgba(212, 175, 55, 0.2);
+    --shadow: rgba(0,0,0,0.5);
+    --glass: rgba(255,255,255,0.03);
 }
 
 .light-theme {
-    --bg: #f0f2f5;
+    --bg: #f8f9fa;
     --card: #ffffff;
-    --text: #1a1a1a;
-    --border: #ddd;
+    --text: #222;
+    --shadow: rgba(0,0,0,0.1);
+    --glass: rgba(0,0,0,0.02);
 }
 
-body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; transition: 0.3s; margin: 0; }
-.app-container { max-width: 600px; margin: auto; padding: 15px; }
+body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; margin: 0; transition: 0.4s; }
 
-/* الهيدر واللوجو */
-.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.logo { font-weight: 900; font-size: 1.8rem; margin: 0; }
-.logo span { color: var(--primary); }
-#theme-toggle { background: var(--card); border: 1px solid var(--border); border-radius: 50%; padding: 10px; cursor: pointer; font-size: 1.2rem; }
+/* تصميم الهيدر والزراير "الحية" */
+.logo-area { display: flex; justify-content: space-between; align-items: center; padding: 20px; }
+.glitch { font-size: 2rem; font-weight: 900; }
+.glitch span { color: var(--primary); text-shadow: 0 0 10px var(--primary); }
 
-/* نظام الحزم (Modules) */
-.module-card {
-    background: var(--card); border-radius: 20px; padding: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1); border: 1px solid var(--border);
-    margin-bottom: 20px;
+.quick-nav { display: flex; gap: 15px; padding: 0 20px; }
+.nav-item { 
+    flex: 1; background: var(--card); padding: 15px; border-radius: 20px; 
+    text-align: center; cursor: pointer; border: 1px solid var(--glass);
+    transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
-.module-header { font-weight: 900; color: var(--primary); margin-bottom: 15px; border-bottom: 1px solid var(--border); padding-bottom: 5px; }
+.nav-item:hover { transform: translateY(-7px); border-color: var(--primary); box-shadow: 0 10px 20px var(--shadow); }
+.nav-item .icon { font-size: 1.5rem; display: block; }
+.nav-item .label { font-size: 0.8rem; font-weight: bold; }
 
-/* الزراير الحية */
-.nav-card {
-    flex: 1; background: var(--card); border: 1px solid var(--border);
-    padding: 15px; border-radius: 15px; color: var(--text); font-weight: bold;
-    cursor: pointer; transition: 0.3s;
-}
-.nav-card:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 5px 15px rgba(212,175,55,0.2); }
-
-.barbers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+/* الكراسي */
+.chairs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
 .barber-item { 
-    background: var(--bg); border: 1px solid var(--border); padding: 20px; 
-    border-radius: 20px; text-align: center; cursor: pointer; transition: 0.3s;
+    background: var(--card); border-radius: 25px; padding: 25px; 
+    border: 1px solid var(--glass); text-align: center; cursor: pointer; transition: 0.3s;
 }
-.barber-item:hover { background: var(--primary); color: #000; }
+.barber-item:hover { background: var(--primary); color: #000; transform: scale(1.03); }
 
-/* الفلترة والطباعة */
-.filter-box { background: rgba(212, 175, 55, 0.05); padding: 15px; border-radius: 15px; margin-bottom: 20px; }
-.date-inputs { display: flex; gap: 10px; margin-bottom: 10px; }
-.date-inputs input { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid var(--border); background: var(--card); color: var(--text); }
-.btn-print-custom { width: 100%; padding: 10px; background: var(--primary); border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+/* المودال الكريتيف */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: none; backdrop-filter: blur(5px); }
+.creative-card-modal { 
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
+    background: var(--card); width: 90%; max-width: 380px; padding: 40px 30px; 
+    border-radius: 35px; border: 1px solid var(--primary); z-index: 1001; 
+    display: none; text-align: center; opacity: 0; transition: 0.4s;
+}
+.creative-card-modal.active { display: block; opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-/* السجلات */
-.logs-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 20px; }
-.log-box { font-size: 0.75rem; background: var(--bg); padding: 10px; border-radius: 10px; height: 150px; overflow-y: auto; }
+.modal-icon { font-size: 3rem; margin-bottom: 20px; animation: bounce 2s infinite; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-/* الحذف والطباعة المصغرة */
-.chair-row { display: flex; justify-content: space-between; align-items: center; background: var(--bg); padding: 10px; border-radius: 10px; margin-bottom: 10px; border-right: 4px solid var(--primary); }
-.btn-del { color: #ff4d4d; background: none; border: none; cursor: pointer; }
+.btn-confirm-shiny { 
+    width: 100%; padding: 15px; background: linear-gradient(45deg, var(--primary), #f1c40f);
+    border: none; border-radius: 15px; font-weight: 900; cursor: pointer; margin-top: 15px;
+}
+
+/* شريط الإيرادات */
+.quick-stats-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+.stat-box { background: var(--glass); padding: 15px; border-radius: 15px; border: 1px solid var(--glass); text-align: center; }
+.stat-box b { color: var(--primary); font-size: 1.3rem; }
 
 .hidden { display: none; }
-.fade-in { animation: fadeIn 0.4s ease; }
+.fade-in { animation: fadeIn 0.5s ease; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-@media print {
-    body { background: white !important; color: black !important; }
-    .nav-card, #theme-toggle, .admin-quick-actions, .filter-box, .btn-secondary, .btn-del { display: none !important; }
-    .module-card { border: 1px solid #000; box-shadow: none; margin: 0; padding: 10px; }
-}
+/* Light Mode Styles */
+.light-theme #theme-btn .icon { content: "☀️"; }
+.light-theme .nav-item { box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
