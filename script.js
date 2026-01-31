@@ -1,98 +1,145 @@
-// استعادة البيانات والباسوردات من الذاكرة أو وضع القيم الافتراضية
-let db = JSON.parse(localStorage.getItem('mosad_mega_safe')) || [];
-let PASSWORDS = JSON.parse(localStorage.getItem('mosad_passwords')) || { 
-    'مسعد': '7007', 
-    'محمد': '1397', 
-    'محمود': '1593' 
-};
-let user = "";
+// استدعاء البيانات من الذاكرة أو إنشاء بيانات جديدة
+let db = JSON.parse(localStorage.getItem('studio_db')) || [];
+let attendance = JSON.parse(localStorage.getItem('studio_attendance')) || [];
+let chairs = JSON.parse(localStorage.getItem('studio_chairs')) || ["كرسي 1", "كرسي 2", "كرسي 3"];
+let adminPass = localStorage.getItem('studio_admin_pass') || '5050';
 
-function login(name) {
-    let p = prompt(`قولنا سرك يا ${name} (الباسورد):`);
-    if (p === PASSWORDS[name]) {
-        user = name;
-        document.getElementById('login-screen').classList.add('hidden');
-        document.getElementById('work-screen').classList.remove('hidden');
-        document.getElementById('active-user').innerText = "يا مراحب يا " + name;
-        document.getElementById('active-img').src = name + ".jpg";
-        
-        // زرار الإدارة يظهر لمسعد بس
-        document.getElementById('admin-btn').classList.toggle('hidden', name !== 'مسعد');
-        
-        updateUserTotal();
-    } else { alert("لا يا برنس.. الباسورد غلط!"); }
+let currentUser = "";
+
+// عند فتح الصفحة
+window.onload = () => {
+    renderChairs();
+};
+
+function renderChairs() {
+    const grid = document.getElementById('barbers-grid');
+    grid.innerHTML = "";
+    chairs.forEach(chair => {
+        grid.innerHTML += `
+            <div class="barber-item" onclick="startWork('${chair}')">
+                <div class="chair-icon">💺</div>
+                <h3>${chair}</h3>
+            </div>`;
+    });
+}
+
+function showScreen(screenId) {
+    document.querySelectorAll('.section-box').forEach(s => s.classList.add('hidden'));
+    document.getElementById(screenId).classList.remove('hidden');
+}
+
+// تسجيل العمليات
+function startWork(name) {
+    currentUser = name;
+    showScreen('work-screen');
+    document.getElementById('active-user').innerText =  "العمل على " + name;
+    updateUserTotal();
 }
 
 function saveData() {
     let amt = document.getElementById('amount').value;
     let name = document.getElementById('cust-name').value;
-    if (!amt || amt <= 0) return alert("اكتب الفلوس صح يا معلم!");
+    if (!amt) return alert("ادخل المبلغ!");
 
     db.push({
-        barber: user,
-        customer: name || "زبون طاير",
+        chair: currentUser,
+        customer: name || "عميل",
         price: parseFloat(amt),
         time: new Date().getTime()
     });
 
-    localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
+    localStorage.setItem('studio_db', JSON.stringify(db));
     document.getElementById('amount').value = "";
     document.getElementById('cust-name').value = "";
     updateUserTotal();
-    alert("اتسجلت يا وحش ✅");
+    alert("تم التسجيل بنجاح ✅");
 }
 
 function updateUserTotal() {
     let today = new Date().toDateString();
-    let sum = db.filter(r => r.barber === user && new Date(r.time).toDateString() === today)
+    let sum = db.filter(r => r.chair === currentUser && new Date(r.time).toDateString() === today)
                 .reduce((s, r) => s + r.price, 0);
     document.getElementById('u-today').innerText = sum;
 }
 
+// تسجيل الحضور (البصمة)
+function showAttendance() {
+    let name = prompt("ادخل اسمك لتسجيل الحضور:");
+    if (name) {
+        let now = new Date();
+        let record = {
+            name: name,
+            time: now.toLocaleString('ar-EG'),
+            timestamp: now.getTime()
+        };
+        attendance.push(record);
+        localStorage.setItem('studio_attendance', JSON.stringify(attendance));
+        alert(`تم تسجيل حضورك يا ${name} \n الساعة: ${record.time}`);
+    }
+}
+
+// لوحة الإدارة
 function showAdmin() {
-    let p = prompt("باسورد الخزنة السري (المدير بس):");
-    if (p !== '5050') return alert("المنطقة دي خطر عليك!");
-    
-    document.getElementById('work-screen').classList.add('hidden');
-    document.getElementById('admin-screen').classList.remove('hidden');
+    let p = prompt("باسورد الإدارة:");
+    if (p !== adminPass) return alert("خطأ في الباسورد!");
 
+    showScreen('admin-screen');
+    renderAdminStats();
+}
+
+function renderAdminStats() {
     let now = new Date().getTime();
-    const filterByTime = (ms) => db.filter(r => (now - r.time) < ms).reduce((s, r) => s + r.price, 0);
+    let statsHtml = "";
+    
+    // حساب إجمالي المحل
+    const calc = (timeFrame) => db.filter(r => (now - r.time) < timeFrame).reduce((s, r) => s + r.price, 0);
+    
+    statsHtml += `
+        <div class="report-card gold-border"><h3>إجمالي اليوم (كل الكراسي)</h3><span>${calc(86400000)} ج</span></div>
+        <div class="report-card"><h3>إجمالي الأسبوع</h3><span>${calc(604800000)} ج</span></div>
+    `;
 
-    document.getElementById('s-day').innerText = filterByTime(86400000); 
-    document.getElementById('s-week').innerText = filterByTime(604800000); 
-    document.getElementById('s-month').innerText = filterByTime(2592000000); 
-    document.getElementById('s-year').innerText = filterByTime(31536000000); 
-
-    let html = "";
-    db.slice().reverse().forEach(r => {
-        let t = new Date(r.time).toLocaleTimeString('ar-EG');
-        html += `<div class="log-item"><span><b>${r.barber}</b>: ${r.price} ج</span><span style="color:gray">${t}</span></div>`;
+    // تفاصيل كل كرسي
+    chairs.forEach(chair => {
+        let chairTotal = db.filter(r => r.chair === chair && (now - r.time) < 86400000)
+                           .reduce((s, r) => s + r.price, 0);
+        statsHtml += `<div class="report-card"><h3>${chair} (اليوم)</h3><span>${chairTotal} ج</span></div>`;
     });
-    document.getElementById('log-body').innerHTML = html;
+
+    document.getElementById('admin-stats').innerHTML = statsHtml;
+
+    // عرض السجل المختلط (حضور وعمليات)
+    let logHtml = "";
+    let combinedLogs = [
+        ...db.map(i => ({...i, type: 'money'})),
+        ...attendance.map(i => ({...i, type: 'att'}))
+    ].sort((a, b) => b.time - a.time || b.timestamp - a.timestamp);
+
+    combinedLogs.slice(0, 20).forEach(log => {
+        if(log.type === 'money') {
+            logHtml += `<div class="log-item"><span>💰 ${log.chair}: ${log.price}ج</span> <small>${new Date(log.time).toLocaleTimeString()}</small></div>`;
+        } else {
+            logHtml += `<div class="log-item" style="color:#2ecc71"><span>🕒 حضور: ${log.name}</span> <small>${log.time}</small></div>`;
+        }
+    });
+    document.getElementById('log-body').innerHTML = logHtml;
 }
 
-// دالة تغيير الباسورد (لمسعد فقط جوه اللوحة)
-function changePass(targetUser) {
-    let newPass = prompt(`اكتب الباسورد الجديد لـ ${targetUser}:`);
-    if (newPass && newPass.length >= 2) {
-        PASSWORDS[targetUser] = newPass;
-        localStorage.setItem('mosad_passwords', JSON.stringify(PASSWORDS));
-        alert(`تم تغيير باسورد ${targetUser} بنجاح ✅`);
-    } else {
-        alert("الباسورد قصير اوي يا كنج!");
+function addNewChair() {
+    let name = prompt("اسم الكرسي الجديد؟");
+    if (name) {
+        chairs.push(name);
+        localStorage.setItem('studio_chairs', JSON.stringify(chairs));
+        renderChairs();
+        alert("تمت إضافة الكرسي");
     }
 }
 
-function clearAllData() {
-    if (confirm("هتصفر الخزنة؟ مفيش رجوع!") && confirm("تأكيد نهائي؟")) {
-        db = [];
-        localStorage.setItem('mosad_mega_safe', JSON.stringify(db));
-        location.reload();
+function changeAdminPass() {
+    let newPass = prompt("ادخل الباسورد الجديد:");
+    if (newPass) {
+        adminPass = newPass;
+        localStorage.setItem('studio_admin_pass', newPass);
+        alert("تم تغيير الباسورد بنجاح");
     }
-}
-
-function hideAdmin() {
-    document.getElementById('admin-screen').classList.add('hidden');
-    document.getElementById('work-screen').classList.remove('hidden');
 }
