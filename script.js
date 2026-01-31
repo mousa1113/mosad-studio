@@ -1,98 +1,98 @@
-let db = JSON.parse(localStorage.getItem('ms_data')) || [];
-let attendance = JSON.parse(localStorage.getItem('ms_att')) || [];
-let chairs = JSON.parse(localStorage.getItem('ms_chairs')) || ["الكرسي 1", "الكرسي 2", "الكرسي 3"];
-let currentUser = "";
+let db = JSON.parse(localStorage.getItem('mosad_db')) || [];
+let attendance = JSON.parse(localStorage.getItem('mosad_att')) || [];
+let chairs = JSON.parse(localStorage.getItem('mosad_chairs')) || ["كرسي 1", "كرسي 2", "كرسي 3"];
+let user = "";
 
 window.onload = () => {
-    updateClock();
-    setInterval(updateClock, 1000);
     renderChairs();
+    setInterval(() => {
+        document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('ar-EG');
+    }, 1000);
     if(localStorage.getItem('theme') === 'light') toggleTheme(true);
 };
 
-function updateClock() {
-    document.getElementById('digital-clock').innerText = new Date().toLocaleTimeString('ar-EG');
-}
-
 function renderChairs() {
-    const grid = document.getElementById('chairs-grid');
-    grid.innerHTML = chairs.map(c => `
-        <div class="chair-btn" onclick="selectUser('${c}')">
-            <b>${c}</b>
+    document.getElementById('chairs-grid').innerHTML = chairs.map(c => `
+        <div class="barber-item" onclick="login('${c}')">
+            <h3>${c}</h3>
         </div>
     `).join('');
 }
 
-function selectUser(name) {
-    let p = prompt(`كلمة المرور الخاصة بـ ${name}:`);
-    if(p === '1234' || name === 'الكرسي 1') { // عدل الباسوردات هنا
-        currentUser = name;
+function login(name) {
+    let p = prompt(`كلمة سر ${name}:`);
+    if (p === '1234' || name === 'مسعد') { // الباسورد الافتراضي
+        user = name;
         document.getElementById('login-screen').classList.add('hidden');
         document.getElementById('work-screen').classList.remove('hidden');
-        document.getElementById('active-user-display').innerText = name;
+        document.getElementById('active-user').innerText = name;
         updateUserTotal();
-    }
+    } else { alert("غلط!"); }
 }
 
-function saveTransaction() {
+function saveData() {
     let amt = document.getElementById('amount').value;
-    if(!amt) return alert("يرجى إدخال المبلغ");
+    if (!amt) return alert("اكتب المبلغ!");
     db.push({
-        user: currentUser,
+        barber: user,
         price: parseFloat(amt),
         time: new Date().getTime(),
-        dateStr: new Date().toLocaleString('ar-EG')
+        timeStr: new Date().toLocaleTimeString('ar-EG')
     });
-    localStorage.setItem('ms_data', JSON.stringify(db));
+    localStorage.setItem('mosad_db', JSON.stringify(db));
     document.getElementById('amount').value = "";
     updateUserTotal();
-    alert("تم التسجيل");
+    alert("تم الحفظ");
 }
 
-function accessAdmin() {
-    let p = prompt("كلمة مرور الإدارة:");
-    if(p === '5050') {
-        document.getElementById('admin-panel').classList.remove('hidden');
+function showAdmin() {
+    if (prompt("باسورد الخزنة:") === '5050') {
+        document.getElementById('main-ui').classList.add('hidden');
+        document.getElementById('admin-screen').classList.remove('hidden');
         renderAdminStats();
     }
 }
 
 function renderAdminStats() {
-    const now = new Date().getTime();
-    const filter = (ms) => db.filter(r => (now - r.time) < ms).reduce((a, b) => a + b.price, 0);
+    let now = new Date().getTime();
+    const filter = (ms) => db.filter(r => (now - r.time) < ms).reduce((s, r) => s + r.price, 0);
 
     document.getElementById('s-day').innerText = filter(86400000) + " ج";
     document.getElementById('s-week').innerText = filter(604800000) + " ج";
     document.getElementById('s-month').innerText = filter(2592000000) + " ج";
     document.getElementById('s-year').innerText = filter(31536000000) + " ج";
 
-    document.getElementById('money-log').innerHTML = db.slice().reverse().map(r => `
-        <div style="padding:5px; border-bottom:1px solid #333">${r.user}: ${r.price}ج - ${r.dateStr}</div>
+    document.getElementById('log-body').innerHTML = db.slice().reverse().map(r => `
+        <div>${r.barber}: ${r.price}ج (${r.timeStr})</div>
+    `).join('');
+    
+    document.getElementById('att-body').innerHTML = attendance.slice().reverse().map(a => `
+        <div>${a.name} - ${a.time}</div>
     `).join('');
 }
 
-function handleAttendance() {
-    let name = prompt("اسم الموظف:");
-    if(name) {
-        attendance.push({ name, time: new Date().toLocaleString('ar-EG') });
-        localStorage.setItem('ms_att', JSON.stringify(attendance));
+function markAttendance() {
+    let n = prompt("اسم الموظف:");
+    if(n) {
+        attendance.push({ name: n, time: new Date().toLocaleTimeString('ar-EG') });
+        localStorage.setItem('mosad_att', JSON.stringify(attendance));
         alert("تم تسجيل الحضور");
     }
 }
 
 function addNewChair() {
-    let name = prompt("اسم الكرسي الجديد:");
-    if(name) {
-        chairs.push(name);
-        localStorage.setItem('ms_chairs', JSON.stringify(chairs));
+    let n = prompt("اسم الكرسي الجديد:");
+    if(n) {
+        chairs.push(n);
+        localStorage.setItem('mosad_chairs', JSON.stringify(chairs));
         renderChairs();
     }
 }
 
-function clearData(type) {
-    if(confirm("هل أنت متأكد؟")) {
-        if(type === 'money') { db = []; localStorage.setItem('ms_data', '[]'); }
-        else { attendance = []; localStorage.setItem('ms_att', '[]'); }
+function clearLog(type) {
+    if(confirm("مسح؟")) {
+        if(type === 'money') { db = []; localStorage.setItem('mosad_db', '[]'); }
+        else { attendance = []; localStorage.setItem('mosad_att', '[]'); }
         renderAdminStats();
     }
 }
@@ -102,10 +102,10 @@ function toggleTheme(init=false) {
     localStorage.setItem('theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
 }
 
-function closeAdmin() { document.getElementById('admin-panel').classList.add('hidden'); }
-function exitWork() { location.reload(); }
+function closeAdmin() { location.reload(); }
+
 function updateUserTotal() {
     let today = new Date().toDateString();
-    let sum = db.filter(r => r.user === currentUser && new Date(r.time).toDateString() === today).reduce((a,b)=>a+b.price, 0);
-    document.getElementById('u-today-val').innerText = sum + " ج.م";
+    let sum = db.filter(r => r.barber === user && new Date(r.time).toDateString() === today).reduce((s, r) => s + r.price, 0);
+    document.getElementById('u-today').innerText = sum;
 }
